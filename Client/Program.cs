@@ -20,10 +20,10 @@
             };
             Console.WriteLine("Введите Ваш Ник: ");
                  message.NicknameFrom = Console.ReadLine();
-            
+            //var serverTask = Task.Run(() => server.RecieverStartAsync());
             do
             {
-               // server.RecieverStartAsync();        
+                
              Console.WriteLine("Введите сообщение: ");
                 message.Text = Console.ReadLine();
                 if (String.IsNullOrEmpty(message.Text))

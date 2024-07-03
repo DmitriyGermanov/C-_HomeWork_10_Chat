@@ -4,31 +4,51 @@ using System.Text;
 
 namespace Server
 {
-    /*    Убедившись что у нас есть все для отправки и получения сообщения напишем прообраз нашего чата.Это будет утилита которая умеет работать как сервер или же как клиент в зависимости от параметров командной строки.Сервер будет уметь отправлять сообщения тогда как клиент принимать.*/
     public delegate void ServerDelegate(string message);
     public class Server
     {
-
         public event ServerDelegate? IncomingMessage;
-        public void Start()
+
+        private CancellationTokenSource cancellationToken;
+
+        public Server()
+        {
+            cancellationToken = new CancellationTokenSource();
+        }
+
+        public async Task StartAsync()
         {
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
             using (UdpClient udpClient = new UdpClient(12345))
             {
-                
-                //udpClient.Connect(iPEndPoint);
-                Console.WriteLine("Сервер ждет сообщения от клиента: ");
+                Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
                 while (true)
                 {
+                    if (cancellationToken.Token.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Сервер остановлен.");
+                        break;
+                    }
+
                     try
                     {
-                        byte[] buffer = udpClient.Receive(ref remoteEP);
-                        string result = Encoding.UTF8.GetString(buffer);
-                        IncomingMessage.Invoke(result);
-                        string responseMessage = "Сообщение получено!";
-                        byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
-                        //Console.WriteLine(remoteEP);
-                        udpClient.Send(responseData, responseData.Length, remoteEP);
+                        var receiveTask = udpClient.ReceiveAsync();
+                        var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
+
+                        if (completedTask == receiveTask)
+                        {
+                            UdpReceiveResult result = receiveTask.Result;
+                            string message = Encoding.UTF8.GetString(result.Buffer);
+                            IncomingMessage?.Invoke(message);
+                            string responseMessage = "Сообщение получено!";
+                            byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
+                            await udpClient.SendAsync(responseData, responseData.Length, result.RemoteEndPoint);
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Console.WriteLine("Операция отменена.");
+                        break;
                     }
                     catch (SocketException se)
                     {
@@ -42,5 +62,9 @@ namespace Server
             }
         }
 
+        public void Stop()
+        {
+            cancellationToken.Cancel();
+        }
     }
 }

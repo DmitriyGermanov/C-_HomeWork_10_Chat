@@ -12,8 +12,10 @@
                     message.DateTime = DateTime.Now;*/
             Server server = new();
             server.IncomingMessage += OnMessageReceived;
-            Thread serverThread = new Thread(server.Start);
-            serverThread.Start();
+            var serverTask = Task.Run(() => server.StartAsync());
+    
+            Console.ReadLine();
+            server.Stop();
 
             /*            Message? message2 = Message.DeserializeFromJson(message.SerializeMessageToJson());
                         Console.WriteLine(message2?.NicknameTo);*/

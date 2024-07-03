@@ -16,21 +16,21 @@ namespace Client
         {
             /*           while (true)
                        {*/
-            // Console.WriteLine("Я запустился и жду сообщений");
-            var receiveTask = udpClient.ReceiveAsync();
-            if (await Task.WhenAny(receiveTask, Task.Delay(5000)) == receiveTask)
+            Console.WriteLine("Я запустился и жду сообщений");
+            while (true)
             {
-                // Сообщение получено
-                var result = receiveTask.Result;
-                IncomingMessage?.Invoke(true);
+                var receiveTask = udpClient.ReceiveAsync();
+                if (await Task.WhenAny(receiveTask, Task.Delay(5000)) == receiveTask)
+                {
+                    var result = receiveTask.Result;
+                    IncomingMessage?.Invoke(true);
+                }
+                else
+                {
+                    IncomingMessage?.Invoke(false);
+                }
+                //Console.WriteLine("Сообщение получено");
             }
-            else
-            {
-                // Тайм-аут
-                IncomingMessage?.Invoke(false);
-            }
-            //Console.WriteLine("Сообщение получено");
-
         }
 
 
