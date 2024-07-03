@@ -1,4 +1,6 @@
 ﻿using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 namespace Client
 {
     public delegate void IncomingMess(bool isRecieved);
@@ -14,23 +16,31 @@ namespace Client
 
         public async Task RecieverStartAsync()
         {
-            /*           while (true)
-                       {*/
-            Console.WriteLine("Я запустился и жду сообщений");
-            while (true)
+            /*         while (true)
+                        {
+                            var receiveTask = udpClient.ReceiveAsync();
+                            var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite));
+                            if (completedTask == receiveTask)
+                            {
+
+                                IncomingMessage?.Invoke(true);
+
+                            }
+                        }*/
+
+            //Console.WriteLine("Я запустился и жду сообщений");
+
+            var receiveTask = udpClient.ReceiveAsync();
+            if (await Task.WhenAny(receiveTask, Task.Delay(5000)) == receiveTask)
             {
-                var receiveTask = udpClient.ReceiveAsync();
-                if (await Task.WhenAny(receiveTask, Task.Delay(5000)) == receiveTask)
-                {
-                    var result = receiveTask.Result;
-                    IncomingMessage?.Invoke(true);
-                }
-                else
-                {
-                    IncomingMessage?.Invoke(false);
-                }
-                //Console.WriteLine("Сообщение получено");
+                var result = receiveTask.Result;
+                IncomingMessage?.Invoke(true);
             }
+            else
+            {
+                IncomingMessage?.Invoke(false);
+            }
+
         }
 
 
