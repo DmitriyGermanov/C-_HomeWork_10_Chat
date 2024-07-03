@@ -20,7 +20,8 @@
             };
             Console.WriteLine("Введите Ваш Ник: ");
                  message.NicknameFrom = Console.ReadLine();
-            var serverTask = Task.Run(() => server.RecieverStartAsync());
+           // var serverTask = Task.Run(() => server.RecieverStartAsync());
+           //Себе: Для использования сервера в асинхронном режиме, должен быть новый экземпляр udpClient, передавать нельзя
             do
             {
                 
