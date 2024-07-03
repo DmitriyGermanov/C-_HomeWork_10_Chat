@@ -65,6 +65,7 @@ namespace Server
         public void Stop()
         {
             cancellationToken.Cancel();
+            
         }
     }
 }

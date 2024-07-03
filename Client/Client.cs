@@ -34,12 +34,13 @@ namespace Client
                 if (disposing)
                 {
                     // TODO: освободить управляемое состояние (управляемые объекты)
+                    disposedValue = true;
+                    udpClient?.Dispose();
                 }
 
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
                 // TODO: установить значение NULL для больших полей
-                disposedValue = true;
-                udpClient?.Dispose();
+
             }
         }
 

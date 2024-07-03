@@ -9,7 +9,6 @@
             int counter = 0;
             Client client = new Client();
             Server server = new Server(client.UdpClient);
-            bool flag = true;
 
             server.IncomingMessage += (bool isRecieved) =>
             {
@@ -25,20 +24,16 @@
             do
             {
                 
-             Console.WriteLine("Введите сообщение: ");
+             Console.WriteLine("Введите сообщение или Exit для выхода: ");
                 message.Text = Console.ReadLine();
-                if (String.IsNullOrEmpty(message.Text))
-                {
-                    flag = false;
-                    continue;
-                }
+                if (message.Text.Equals("Exit"))
+                    break;
                 Console.WriteLine("Введите для кого сообщение: ");
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
                 await client.SendMessageAsync(message);
                 await server.RecieverStartAsync();
-            } while (flag);
-            Console.ReadLine();
+            } while (true);
         }
     }
 }

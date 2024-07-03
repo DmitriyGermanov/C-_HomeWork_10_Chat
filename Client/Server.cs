@@ -1,12 +1,12 @@
 ﻿using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 namespace Client
 {
     public delegate void IncomingMess(bool isRecieved);
-    public class Server
+    public class Server : IDisposable
     {
         private readonly UdpClient udpClient;
+        private bool disposedValue;
+
         public event IncomingMess IncomingMessage;
 
         public Server(UdpClient client)
@@ -43,6 +43,35 @@ namespace Client
 
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: освободить управляемое состояние (управляемые объекты)
+                    udpClient.Close();
+                    udpClient.Dispose();
+                }
 
+                // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
+                // TODO: установить значение NULL для больших полей
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: переопределить метод завершения, только если "Dispose(bool disposing)" содержит код для освобождения неуправляемых ресурсов
+        // ~Server()
+        // {
+        //     // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
