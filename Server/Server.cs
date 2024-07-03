@@ -10,15 +10,15 @@ namespace Server
     {
 
         public event ServerDelegate? IncomingMessage;
-        private bool flag = true;
         public void Start()
         {
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
             using (UdpClient udpClient = new UdpClient(12345))
             {
+                
                 //udpClient.Connect(iPEndPoint);
                 Console.WriteLine("Сервер ждет сообщения от клиента: ");
-                while (flag)
+                while (true)
                 {
                     try
                     {
@@ -41,11 +41,6 @@ namespace Server
                 }
             }
         }
-        public void Stop()
-        {
-            {
-                flag = false;
-            }
-        }
+
     }
 }

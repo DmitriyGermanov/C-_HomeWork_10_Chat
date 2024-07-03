@@ -11,16 +11,19 @@
             Server server = new Server(client.UdpClient);
             bool flag = true;
 
-            server.IncomingMessage += () =>
+            server.IncomingMessage += (bool isRecieved) =>
             {
+                if(isRecieved)
                 Console.WriteLine("Сообщение успешно доставлено");
+                else
+                    Console.WriteLine("Возможно сообщение не было доставлено, повторите отправку!");
             };
             Console.WriteLine("Введите Ваш Ник: ");
                  message.NicknameFrom = Console.ReadLine();
-            //_ = Task.Run(async () =>  server.RecieverStartAsync());
+            
             do
             {
-                server.RecieverStartAsync();        
+               // server.RecieverStartAsync();        
              Console.WriteLine("Введите сообщение: ");
                 message.Text = Console.ReadLine();
                 if (String.IsNullOrEmpty(message.Text))
@@ -32,7 +35,7 @@
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
                 await client.SendMessageAsync(message);
-                await Task.Delay(50);
+                await server.RecieverStartAsync();
             } while (flag);
             Console.ReadLine();
         }
