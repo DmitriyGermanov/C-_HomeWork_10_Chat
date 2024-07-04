@@ -5,11 +5,6 @@
         public static Message LastProcessedMessage { get; set; }
         static void Main(string[] args)
         {
-            /*        Message message = new();
-                    message.Text = "Hello";
-                    message.NicknameFrom = "Beast";
-                    message.NicknameTo = "PinkRabbit";
-                    message.DateTime = DateTime.Now;*/
             Server server = new();
             server.IncomingMessage += OnMessageReceived;
             //var serverTask = Task.Run(() => server.StartAsync()); //Реализация для первого варианта, на асинхронном RecieveAsync()
