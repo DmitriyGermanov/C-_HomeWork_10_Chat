@@ -21,7 +21,6 @@ namespace Server
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
             using (UdpClient udpClient = new UdpClient(12345))
             {
-                //ToDo: Убрать вывод сообщений в консоль в данном классе, реализовать обмен данными с помощью событий
                 while (true)
                 {
                     if (cancellationToken.Token.IsCancellationRequested)
