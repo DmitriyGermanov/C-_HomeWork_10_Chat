@@ -22,12 +22,10 @@ namespace Server
             using (UdpClient udpClient = new UdpClient(12345))
             {
                 //ToDo: Убрать вывод сообщений в консоль в данном классе, реализовать обмен данными с помощью событий
-                Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
                 while (true)
                 {
                     if (cancellationToken.Token.IsCancellationRequested)
                     {
-                        Console.WriteLine("Сервер остановлен.");
                         break;
                     }
 

@@ -7,12 +7,9 @@ namespace Client
         private readonly UdpClient udpClient;
         private bool disposedValue;
 
-        public event IncomingMess IncomingMessage;
+        public event IncomingMess? IncomingMessage;
 
-        public Server(UdpClient client)
-        {
-            udpClient = client;
-        }
+        public Server(UdpClient client) => udpClient = client;
 
         public async Task RecieverStartAsync()
         {
@@ -49,27 +46,17 @@ namespace Client
             {
                 if (disposing)
                 {
-                    // TODO: освободить управляемое состояние (управляемые объекты)
                     udpClient.Close();
                     udpClient.Dispose();
                 }
 
-                // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
-                // TODO: установить значение NULL для больших полей
                 disposedValue = true;
             }
         }
 
-        // // TODO: переопределить метод завершения, только если "Dispose(bool disposing)" содержит код для освобождения неуправляемых ресурсов
-        // ~Server()
-        // {
-        //     // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
-        //     Dispose(disposing: false);
-        // }
 
         public void Dispose()
         {
-            // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
