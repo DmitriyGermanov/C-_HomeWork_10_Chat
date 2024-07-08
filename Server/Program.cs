@@ -2,16 +2,19 @@
 {
     internal class Program
     {
+        private static CancellationTokenSource cancellationTokenSource = new(); 
         public static Stack<Message>? LastProcessedMessages = new();
         static void Main(string[] args)
         {
-            Server server = new();
+            CancellationToken cTokenStopAll = cancellationTokenSource.Token;
+            Server server = new(cTokenStopAll);
             server.IncomingMessage += OnMessageReceived;
             bool threadFlag = true;
-            Thread serverThread = new(() => server.StartAsync());
-            Thread printerThread = new(() =>
+            //Thread serverThread = new(() => server.StartAsync());
+            Task serverTask = Task.Run(server.StartAsync);
+            Task printerTask = Task.Run(() =>
             {
-                while (threadFlag)
+                while (cTokenStopAll.IsCancellationRequested)
                 {
                     if (LastProcessedMessages.Count > 0)
                     {
@@ -23,16 +26,16 @@
                     }
                 }
             });
-            serverThread.Start();
-            printerThread.Start();
+            //serverThread.Start();
             Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
             Console.ReadKey();
-            threadFlag = false;
-            printerThread.Join();
+            cancellationTokenSource.Cancel();
+            printerTask.Wait();
+            serverTask.Wait();
             //Console.WriteLine(printerThread.ThreadState);
-            server.Stop();
-            serverThread.Join();
-            //Console.WriteLine(serverThread.ThreadState);
+/*            server.Stop();
+            serverThread.Join();*/
+            Console.WriteLine(printerTask.Status);
             Console.WriteLine("Сервер остановлен!");
         }
 

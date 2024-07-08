@@ -10,11 +10,14 @@ namespace Server
         public event ServerDelegate? IncomingMessage;
 
         private CancellationTokenSource cancellationToken;
+        private CancellationToken cToken;
 
         public Server()
         {
             cancellationToken = new CancellationTokenSource();
+            cToken = cancellationToken.Token;
         }
+        public Server(CancellationToken cancellationToken) => this.cToken = cancellationToken;
 
         public async Task StartAsync()
         {
@@ -23,7 +26,7 @@ namespace Server
             {
                 while (true)
                 {
-                    if (cancellationToken.Token.IsCancellationRequested)
+                    if (cToken.IsCancellationRequested)
                     {
                         break;
                     }
