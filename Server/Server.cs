@@ -17,37 +17,37 @@ namespace Server
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        public Server(CancellationToken cancellationToken) => this.cToken = cancellationToken;
+        public Server(CancellationTokenSource cancellationToken)
+        {
+            this.cancellationToken = cancellationToken;
+            cToken = cancellationToken.Token;
+        }
+            
 
         public async Task StartAsync()
         {
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
             using (UdpClient udpClient = new UdpClient(12345))
             {
-                while (true)
+                while (!cToken.IsCancellationRequested)
                 {
-                    if (cToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
                     try
                     {
-                        udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient); //Второй вариант асинхронной реализации, возможной для использования с потоком
-                        await Task.Delay(500);
+                        /*               udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient); //Второй вариант асинхронной реализации, возможной для использования с потоком
+                                       await Task.Delay(500);*/
 
-                        /*    var receiveTask = udpClient.ReceiveAsync(); //Первый рабочий вариант реализации
-                                 var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
+                        var receiveTask = udpClient.ReceiveAsync(); //Первый рабочий вариант реализации
+                        var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
 
-                                 if (completedTask == receiveTask)
-                                 {
-                                     UdpReceiveResult result = receiveTask.Result;
-                                     string message = Encoding.UTF8.GetString(result.Buffer);
-                                     IncomingMessage?.Invoke(message);
-                                     string responseMessage = "Сообщение получено!";
-                                     byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
-                                     await udpClient.SendAsync(responseData, responseData.Length, result.RemoteEndPoint);
-                                 }*/
+                        if (completedTask == receiveTask)
+                        {
+                            UdpReceiveResult result = receiveTask.Result;
+                            string message = Encoding.UTF8.GetString(result.Buffer);
+                            IncomingMessage?.Invoke(message);
+                            string responseMessage = "Сообщение получено!";
+                            byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
+                            await udpClient.SendAsync(responseData, responseData.Length, result.RemoteEndPoint);
+                        }
                     }
                     catch (OperationCanceledException)
                     {

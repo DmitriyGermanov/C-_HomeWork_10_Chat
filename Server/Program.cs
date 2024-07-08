@@ -7,14 +7,14 @@
         static void Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            Server server = new(cTokenStopAll);
+            Server server = new Server(cancellationTokenSource);
             server.IncomingMessage += OnMessageReceived;
             bool threadFlag = true;
             //Thread serverThread = new(() => server.StartAsync());
             Task serverTask = Task.Run(server.StartAsync);
             Task printerTask = Task.Run(() =>
             {
-                while (cTokenStopAll.IsCancellationRequested)
+                while (!cTokenStopAll.IsCancellationRequested)
                 {
                     if (LastProcessedMessages.Count > 0)
                     {
@@ -35,7 +35,7 @@
             //Console.WriteLine(printerThread.ThreadState);
 /*            server.Stop();
             serverThread.Join();*/
-            Console.WriteLine(printerTask.Status);
+            //Console.WriteLine(printerTask.Status);
             Console.WriteLine("Сервер остановлен!");
         }
 
