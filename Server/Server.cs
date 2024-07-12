@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Server
 {
-    public delegate void ServerDelegate(string message);
+    public delegate void ServerDelegate(string message, IPEndPoint remoteEndPoint);
     public class Server
     {
         public event ServerDelegate? IncomingMessage;
@@ -43,10 +43,8 @@ namespace Server
                         {
                             UdpReceiveResult result = receiveTask.Result;
                             string message = Encoding.UTF8.GetString(result.Buffer);
-                            IncomingMessage?.Invoke(message);
-                            string responseMessage = "Сообщение получено!";
-                            byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
-                            await udpClient.SendAsync(responseData, responseData.Length, result.RemoteEndPoint);
+                            IncomingMessage?.Invoke(message, result.RemoteEndPoint);
+
                         }
                     }
                     catch (OperationCanceledException)
@@ -80,7 +78,7 @@ namespace Server
             {
                 byte[] receiveBytes = udpClient.EndReceive(ar, ref remoteEP);
                 string message = Encoding.UTF8.GetString(receiveBytes);
-                IncomingMessage?.Invoke(message);
+                IncomingMessage?.Invoke(message, remoteEP);
 
                 string responseMessage = "Сообщение получено!";
                 byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);

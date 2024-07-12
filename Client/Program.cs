@@ -23,7 +23,6 @@
            //Себе: Для использования сервера в асинхронном режиме, должен быть новый экземпляр udpClient, передавать нельзя
             do
             {
-                
              Console.WriteLine("Введите сообщение или Exit для выхода: ");
                 message.Text = Console.ReadLine();
                 if (message.Text.Equals("Exit"))
