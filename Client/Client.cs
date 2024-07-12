@@ -8,7 +8,6 @@ namespace Client
         private IPEndPoint? localEndPoint;
         private UdpClient udpClient;
         private bool disposedValue;
-        public IPEndPoint LocalEndPoint { get => localEndPoint; set => localEndPoint = value; }
         public UdpClient UdpClient { get => udpClient; set => udpClient = value; }
 
         public Client()

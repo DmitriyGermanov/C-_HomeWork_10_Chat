@@ -10,6 +10,7 @@ namespace Server
         private CancellationToken cToken;
         private Stack<IPEndPoint> endPoints;
         public Stack<IPEndPoint> EndPoints => endPoints;
+        private Message message;
         public Messenger()
         {
             cancellationToken = new CancellationTokenSource();
@@ -22,6 +23,13 @@ namespace Server
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
         }
+        public Messenger(CancellationTokenSource cancellationToken, Message message)
+        {
+            this.cancellationToken = cancellationToken;
+            cToken = cancellationToken.Token;
+            endPoints = new Stack<IPEndPoint>();
+            this.message = message;
+        }
         public void EndpointCollector(IPEndPoint endPoint)
         {
             endPoints.Push(endPoint);
@@ -29,18 +37,21 @@ namespace Server
 
         public async Task Sender()
         {
+
+            Message message = new Message { Text = "Сообщение поступило на сервер", DateTime = DateTime.Now, Ask = false };
+
             using (UdpClient udpClient = new UdpClient())
             {
-
                 {
                     while (!cToken.IsCancellationRequested)
                     {
                         if (endPoints.Count > 0)
                         {
-                            string responseMessage = "Сообщение получено!";
-                            byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
+                            string jSonToSend = message.SerializeMessageToJson();
+                            byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
                             await udpClient.SendAsync(responseData, responseData.Length, endPoints.Pop());
                         }
+
                         else
                         {
                             Thread.Sleep(100);
@@ -49,6 +60,16 @@ namespace Server
                 }
             }
         }
-
+        public async Task AnswerSender(Message message, IPEndPoint clientEndpoint)
+        {
+            using (UdpClient udpClient = new UdpClient())
+            {
+                Console.WriteLine("Отправляю сообщение для" + clientEndpoint);
+                string jSonToSend = message.SerializeMessageToJson();
+                byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
+                await udpClient.SendAsync(responseData, responseData.Length, clientEndpoint);
+            }
+        }
     }
 }
+

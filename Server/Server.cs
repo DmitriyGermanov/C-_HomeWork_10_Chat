@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Server
 {
-    public delegate void ServerDelegate(string message, IPEndPoint remoteEndPoint);
+    public delegate void ServerDelegate(Message messaget);
     public class Server
     {
         public event ServerDelegate? IncomingMessage;
@@ -42,8 +42,8 @@ namespace Server
                         if (completedTask == receiveTask)
                         {
                             UdpReceiveResult result = receiveTask.Result;
-                            string message = Encoding.UTF8.GetString(result.Buffer);
-                            IncomingMessage?.Invoke(message, result.RemoteEndPoint);
+                            Message? message = messageGetter(receiveTask);
+                            IncomingMessage?.Invoke(message);
 
                         }
                     }
@@ -69,7 +69,14 @@ namespace Server
             cancellationToken.Cancel();
 
         }
-        private void ReceiveCallback(IAsyncResult ar)
+        private static Message? messageGetter(Task<UdpReceiveResult> receiveTask)
+        {
+            var result = receiveTask.Result;
+            var messageString = Encoding.UTF8.GetString(result.Buffer);
+            var message = Message.DeserializeFromJson(messageString);
+            return message;
+        }
+     /*   private void ReceiveCallback(IAsyncResult ar)
         {
             UdpClient udpClient = (UdpClient)ar.AsyncState;
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
@@ -77,19 +84,17 @@ namespace Server
             try
             {
                 byte[] receiveBytes = udpClient.EndReceive(ar, ref remoteEP);
-                string message = Encoding.UTF8.GetString(receiveBytes);
+                var message = Encoding.UTF8.GetString(receiveBytes);
                 IncomingMessage?.Invoke(message, remoteEP);
-
                 string responseMessage = "Сообщение получено!";
                 byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
                 udpClient.Send(responseData, responseData.Length, remoteEP);
-
                 udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
-        }
+        }*/
     }
 }

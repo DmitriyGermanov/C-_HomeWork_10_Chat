@@ -1,17 +1,32 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
 namespace Client
 {
-    public delegate void IncomingMess(bool isRecieved);
+    public delegate void IncomingMess(bool isRecieved, Message message);
+    public delegate void IncomingMessage(Message message);
+
     public class Server : IDisposable
     {
         private readonly UdpClient udpClient;
         private bool disposedValue;
+        private CancellationTokenSource cancellationToken;
+        private CancellationToken cToken;
+        public IPEndPoint LocalEndPoint
+        {
+            get
+            {
+                return (IPEndPoint)udpClient.Client.LocalEndPoint;
+            }
+        }
 
-        public event IncomingMess? IncomingMessage;
+        public event IncomingMess? IncomingMessageCheck;
+        public event IncomingMessage? IncomingMessage;
 
         public Server(UdpClient client) => udpClient = client;
+        public Server() => udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
 
-        public async Task RecieverStartAsync()
+        public async Task IsRessived()
         {
             /*         while (true)
                         {
@@ -30,14 +45,57 @@ namespace Client
             var receiveTask = udpClient.ReceiveAsync();
             if (await Task.WhenAny(receiveTask, Task.Delay(5000)) == receiveTask)
             {
-                var result = receiveTask.Result;
-                IncomingMessage?.Invoke(true);
+                Message? message = messageGetter(receiveTask);
+                IncomingMessageCheck?.Invoke(true, message);
             }
             else
             {
-                IncomingMessage?.Invoke(false);
+                Message? message = null;
+                IncomingMessageCheck.Invoke(false, message);
             }
 
+        }
+        public async Task WaitForAMessage()
+        {
+            cancellationToken = new CancellationTokenSource();
+            cToken = cancellationToken.Token;
+            while (!cToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var receiveTask = udpClient.ReceiveAsync(); 
+                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
+
+                    if (completedTask == receiveTask)
+                    {
+                        UdpReceiveResult result = receiveTask.Result;
+                        Message? message = messageGetter(receiveTask);
+                        IncomingMessage?.Invoke(message);
+
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine("Операция отменена.");
+                    break;
+                }
+                catch (SocketException se)
+                {
+                    Console.WriteLine("Не удалось подтвердить получение сообщения! Проверьте доступность клиента!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+        }
+
+        private static Message? messageGetter(Task<UdpReceiveResult> receiveTask)
+        {
+            var result = receiveTask.Result;
+            var messageString = Encoding.UTF8.GetString(result.Buffer);
+            var message = Message.DeserializeFromJson(messageString);
+            return message;
         }
 
         protected virtual void Dispose(bool disposing)
