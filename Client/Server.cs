@@ -26,9 +26,9 @@ namespace Client
         public Server(UdpClient client) => udpClient = client;
         public Server() => udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
 
-        public async Task IsRessived()
+        /*public async Task IsRessived()
         {
-            /*         while (true)
+            *//*         while (true)
                         {
                             var receiveTask = udpClient.ReceiveAsync();
                             var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite));
@@ -38,7 +38,7 @@ namespace Client
                                 IncomingMessage?.Invoke(true);
 
                             }
-                        }*/
+                        }*//*
 
             //Console.WriteLine("Я запустился и жду сообщений");
 
@@ -54,7 +54,7 @@ namespace Client
                 IncomingMessageCheck.Invoke(false, message);
             }
 
-        }
+        }*/
         public async Task WaitForAMessage()
         {
             cancellationToken = new CancellationTokenSource();

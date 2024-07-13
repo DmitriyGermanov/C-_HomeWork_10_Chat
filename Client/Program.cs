@@ -20,13 +20,13 @@ namespace Client
                 Messages.Push(message);
             };
 
-            server.IncomingMessageCheck += (bool isRecieved, Message message) =>
+       /*     server.IncomingMessageCheck += (bool isRecieved, Message message) =>
             {
                 if (isRecieved)
                     Console.WriteLine("Сообщение было успешно доставлено!");
                 else
                     Console.WriteLine("Возможно сообщение не было доставлено, повторите отправку!");
-            };
+            };*/
 
             Task printerTask = Task.Run(() =>
             {
@@ -61,7 +61,6 @@ namespace Client
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
                 await client.SendMessageAsync(message);
-                //await server.IsRessived();
             } while (true);
         }
 

@@ -18,6 +18,8 @@ namespace Server.Clients
         private IPEndPoint clientEndPoint;
         private DateTime askTime;
         private Messenger messenger;
+        private bool isOnline;
+        public bool IsOnline { get { return isOnline; } set { } }
         public string Name
         {
             get { return name; }

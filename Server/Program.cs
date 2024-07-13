@@ -11,8 +11,13 @@ namespace Server
         private static ClientList clientBase;
         static void Main(string[] args)
         {
+            //TODO: Сделать фабрику клиентов
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             clientBase = new ClientList();
+            //TODO: Заменить этот вызов на фабричный
+            messenger = new Messenger();
+            Client clientFrom = new(clientBase, messenger);
+            Client clientTo = new(clientBase, messenger);
             Server server = new Server(cancellationTokenSource);
             messenger = new Messenger(cancellationTokenSource);
             server.IncomingMessage += OnMessageReceived;
@@ -26,12 +31,13 @@ namespace Server
                 {
                     if (Messages.Count > 0)
                     {
+                        //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
                         var message = Messages.Pop();
-                        var client = clientBase.GetClientByEndPoint(IPEndPoint.Parse(message.LocalEndPointString));
-                        Console.WriteLine("Сюда зашли");
-                        if (client != null) {
-                            Console.WriteLine("даааа");
-                            client.Send(message);
+                        clientFrom = clientBase.GetClientByEndPoint(IPEndPoint.Parse(message.LocalEndPointString));
+                        //TODO: Заблокировать возможность использовать ники повторно
+                        clientTo = clientBase.GetClientByName(message.NicknameTo);
+                        if (clientFrom != null) {
+                            clientFrom.Send(message);
                         }
                     }
                     else
@@ -61,6 +67,7 @@ namespace Server
             IPEndPoint iPEndPoint = IPEndPoint.Parse(incomingMessage.LocalEndPointString);
             messenger.EndpointCollector(iPEndPoint);
             Task.Run(() => clientBase.ClientRegistration(incomingMessage, iPEndPoint));
+            
         }
     }
 }

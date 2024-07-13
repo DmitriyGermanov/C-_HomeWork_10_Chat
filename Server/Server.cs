@@ -41,8 +41,10 @@ namespace Server
 
                         if (completedTask == receiveTask)
                         {
+             
                             UdpReceiveResult result = receiveTask.Result;
                             Message? message = messageGetter(receiveTask);
+                            //TODO: Сюда добавляем, если получено сообщение с ASK = true, то мы проверяем у клиента isonline, если false делаем true, если Ask false, то инвокаем, если нет, то не инвокаем
                             IncomingMessage?.Invoke(message);
 
                         }

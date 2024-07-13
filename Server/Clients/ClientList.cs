@@ -7,6 +7,7 @@ namespace Server.Clients
         //TODO: Для базы нужен будет синглтон
         private List<Client> clients;
         private Messenger messenger;
+        private Client client;
 
         public ClientList()
         {
@@ -17,27 +18,35 @@ namespace Server.Clients
         public List<Client> Clients => clients;
         public void ClientRegistration(Message message, IPEndPoint clientEndPoint)
         {
-            if (clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)) == null)
+            client = clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+            if (client == null)
             {
                 clients.Add(new Client(this, messenger) { Name = message.NicknameFrom, ClientEndPoint = clientEndPoint, AskTime = DateTime.Now });
             }
-
+            else
+            {
+                if (!client.IsOnline)
+                {
+                    client.IsOnline = true;
+                    client.AskTime = DateTime.Now;
+                }
+            }
         }
         public Client? GetClientByName(string name) => clients.Find(client => client.Name.Equals(name));
         public Client? GetClientByEndPoint(IPEndPoint clientEndPoint) => clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
         public bool RemoveClientByEndPoint(IPEndPoint clientEndPoint) => clients.Remove(clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)));
+        public bool SetClientOffline(Client client) => client.IsOnline = false;
 
         public override void Send(Message message, Client client)
         {
             if (client != null)
             {
-                Console.WriteLine("Зашли");
                 clients.ForEach(thisClient =>
                 {
                     if (thisClient != client)
                         thisClient.Receive(message);
                 });
-           }
+            }
         }
     }
 }
