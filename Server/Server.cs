@@ -1,26 +1,30 @@
-﻿using System.Net;
+﻿using Server.Clients;
+using Server.Messages;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
 namespace Server
 {
-    public delegate void ServerDelegate(Message messaget);
+    public delegate void ServerDelegate(BaseMessage message);
     public class Server
     {
         public event ServerDelegate? IncomingMessage;
 
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
+        private ClientList clientList;
 
         public Server()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        public Server(CancellationTokenSource cancellationToken)
+        internal Server(CancellationTokenSource cancellationToken, ClientList clientList)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
+            this.clientList = clientList;
         }
             
 
@@ -40,10 +44,30 @@ namespace Server
                         {
              
                             UdpReceiveResult result = receiveTask.Result;
-                            Message? message = messageGetter(receiveTask);
-                            //TODO: Сюда добавляем, если получено сообщение с ASK = true, то мы проверяем у клиента isonline, если false делаем true, если Ask false, то инвокаем, если нет, то не инвокаем.
-                            //TODO: Также добавить проверку на DisconnectRequest, если ASK = true и DisconnectRequest = true, то IsOnline = false;
-                            IncomingMessage?.Invoke(message);
+                            BaseMessage? message = messageGetter(receiveTask);
+                            
+                            if (message.Ask && !message.DisconnectRequest)
+                            {
+                                Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
+                                if (client != null)
+                                {
+                                    if (!client.IsOnline)
+                                    {
+                                        client.IsOnline = true;
+                                        client.AskTime = DateTime.Now;
+                                    }
+                                }
+                            }
+                            else if (message.DisconnectRequest && message.Ask)
+                            {
+                                Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
+                                if (client != null)
+                                    clientList.SetClientOffline(client);
+                            }
+                            else
+                            {
+                                IncomingMessage?.Invoke(message);
+                            }
 
                         }
                     }
@@ -65,11 +89,11 @@ namespace Server
         }
 
         public void Stop() => cancellationToken.Cancel();
-           private static Message? messageGetter(Task<UdpReceiveResult> receiveTask)
+           private static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
         {
             var result = receiveTask.Result;
             var messageString = Encoding.UTF8.GetString(result.Buffer);
-            var message = Message.DeserializeFromJson(messageString);
+            var message = BaseMessage.DeserializeFromJson(messageString);
             return message;
         }
         }

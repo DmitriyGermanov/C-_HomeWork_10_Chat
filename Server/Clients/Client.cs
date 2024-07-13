@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Server.Messages;
+using System.Net;
 /*GabilyAslanov: Мы собираемся сделать наш класс полностью клиент-серверным с возможностью отправки данных сразу нескольким клиентам. Доработаем наш код следующим образом. Представьте что наш сервер умеет работать как медиатор (умеет отправлять сообщения по имени клиента), а также умеет возвращать список всех подключенных к нему клиентов. Для этого доработаем наш класс сообщений добавив поле ToName.
 GabilyAslanov: Доработаем систему команд. Имя пользователя сервера всегда будет Server. Если сервер получает команду (как текст сообщения):
 register: то он добавляет клиента в свой список.
@@ -18,7 +19,7 @@ namespace Server.Clients
         private DateTime askTime;
         private Messenger messenger;
         private bool isOnline;
-        public bool IsOnline { get { return isOnline; } set { } }
+        public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
         public string Name
         {
             get { return name; }
@@ -36,7 +37,7 @@ namespace Server.Clients
             set { askTime = value; }
         }
 
-        public override void Receive(Message message)
+        public override void Receive(BaseMessage message)
         {
             Task.Run(() =>
             {
@@ -44,7 +45,7 @@ namespace Server.Clients
             });
         }
 
-        public override void Send(Message message)
+        public override void Send(BaseMessage message)
         {
             mediator.Send(message, this);
         }
@@ -52,6 +53,11 @@ namespace Server.Clients
         public override string? ToString()
         {
             return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
+        }
+
+        internal void SendToClient(Client? client, BaseMessage message)
+        {
+            messenger.AnswerSender(message, client.ClientEndPoint);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Server.Clients
+﻿using Server.Messages;
+
+namespace Server.Clients
 {
     abstract class ClientBase
     {
@@ -7,7 +9,7 @@
         {
             this.mediator = mediator;
         }
-        public abstract void Send (Message message);
-        public abstract void Receive (Message message); 
+        public abstract void Send (BaseMessage message);
+        public abstract void Receive (BaseMessage message); 
     }
 }

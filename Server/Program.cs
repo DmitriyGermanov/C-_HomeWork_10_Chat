@@ -1,28 +1,28 @@
 ﻿using System.Net;
 using Server.Clients;
+using Server.Messages;
 
 namespace Server
 {
     internal class Program
     {
         private static CancellationTokenSource cancellationTokenSource = new();
-        public static Stack<Message>? Messages = new();
+        public static Stack<BaseMessage>? Messages = new();
         private static Messenger? messenger;
-        private static ClientList clientBase;
+        private static ClientList clientList;
         static void Main(string[] args)
         {
             //TODO: Сделать фабрику клиентов
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            clientBase = new ClientList();
+            clientList = new ClientList();
             //TODO: Заменить этот вызов на фабричный
             messenger = new Messenger();
-            Client clientFrom = new(clientBase, messenger);
-            Client clientTo = new(clientBase, messenger);
-            Server server = new Server(cancellationTokenSource);
+            Client clientFrom = new(clientList, messenger);
+            Client clientTo = new(clientList, messenger);
+            Server server = new Server(cancellationTokenSource, clientList);
             messenger = new Messenger(cancellationTokenSource);
             server.IncomingMessage += OnMessageReceived;
             bool threadFlag = true;
-            //Thread serverThread = new(() => server.StartAsync());
             Task serverTask = Task.Run(server.StartAsync);
             Task messengerTask = Task.Run(() => messenger.Sender());
             Task printerTask = Task.Run(() =>
@@ -32,12 +32,17 @@ namespace Server
                     if (Messages.Count > 0)
                     {
                         //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
-                        var message = Messages.Pop();
-                        clientFrom = clientBase.GetClientByEndPoint(IPEndPoint.Parse(message.LocalEndPointString));
+                        BaseMessage message = Messages.Pop();
+                        clientFrom = clientList.GetClientByEndPoint(IPEndPoint.Parse(message.LocalEndPointString));
                         //TODO: Заблокировать возможность использовать ники повторно
-                        clientTo = clientBase.GetClientByName(message.NicknameTo);
-                        if (clientFrom != null) {
+                        clientTo = clientList.GetClientByName(message.NicknameTo);
+                        if (clientFrom != null && message.NicknameTo == "")
+                        {
                             clientFrom.Send(message);
+                        }
+                        else if (clientFrom != null && clientTo != null && clientTo.IsOnline)
+                        {
+                            clientFrom.SendToClient(clientTo, message);
                         }
                     }
                     else
@@ -47,27 +52,22 @@ namespace Server
                 }
             });
 
-            //serverThread.Start();
             Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
             Console.ReadKey();
             cancellationTokenSource.Cancel();
             printerTask.Wait();
             serverTask.Wait();
             messengerTask.Wait();
-            //Console.WriteLine(printerThread.ThreadState);
-            /*            server.Stop();
-                        serverThread.Join();*/
-            //Console.WriteLine(printerTask.Status);
             Console.WriteLine("Сервер остановлен!");
         }
 
-        private static void OnMessageReceived(Message incomingMessage)
+        private static void OnMessageReceived(BaseMessage incomingMessage)
         {
             Messages.Push(incomingMessage);
             IPEndPoint iPEndPoint = IPEndPoint.Parse(incomingMessage.LocalEndPointString);
             messenger.EndpointCollector(iPEndPoint);
-            Task.Run(() => clientBase.ClientRegistration(incomingMessage, iPEndPoint));
-            
+            Task.Run(() => clientList.ClientRegistration(incomingMessage, iPEndPoint));
+
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Server.Messages;
+using Server.Messages.Fabric;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -10,7 +12,7 @@ namespace Server
         private CancellationToken cToken;
         private Stack<IPEndPoint> endPoints;
         public Stack<IPEndPoint> EndPoints => endPoints;
-        private Message message;
+        private BaseMessage message;
         public Messenger()
         {
             cancellationToken = new CancellationTokenSource();
@@ -23,7 +25,7 @@ namespace Server
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
         }
-        public Messenger(CancellationTokenSource cancellationToken, Message message)
+        public Messenger(CancellationTokenSource cancellationToken, BaseMessage message)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
@@ -37,9 +39,9 @@ namespace Server
 
         public async Task Sender()
         {
-
-            Message message = new Message { Text = "Сообщение поступило на сервер", DateTime = DateTime.Now, Ask = false };
-
+            BaseMessage message = new MessageCreatorDefault().FactoryMethod();
+            message.Text= "Сообщение получено сервером!";
+            message.DateTime= DateTime.Now;
             using (UdpClient udpClient = new UdpClient())
             {
                 {
@@ -60,11 +62,11 @@ namespace Server
                 }
             }
         }
-        public async Task AnswerSender(Message message, IPEndPoint clientEndpoint)
+        public async Task AnswerSender(BaseMessage message, IPEndPoint clientEndpoint)
         {
             using (UdpClient udpClient = new UdpClient())
             {
-                Console.WriteLine("Отправляю сообщение для" + clientEndpoint);
+                //Console.WriteLine("Отправляю сообщение для" + clientEndpoint);
                 string jSonToSend = message.SerializeMessageToJson();
                 byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
                 await udpClient.SendAsync(responseData, responseData.Length, clientEndpoint);

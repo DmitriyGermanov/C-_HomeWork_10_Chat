@@ -3,21 +3,21 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Client
-/*    Добавим JSON сериализацию и десериализацию в наш класс.И протестируем его путем компоновки простого сообщения, сериализации и десериализации этого сообщения.
-Код Message может быть модифицирован следующим образом:*/
+namespace Client.Messages
 {
-    public class Message
+    public abstract class BaseMessage
     {
-
         public string? Text { get; set; }
         public DateTime DateTime { get; set; }
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
-        public bool Ask = false;
-        public bool DisconnectRequest = false;
+        public bool Ask { get; set; }
+        public bool DisconnectRequest { get; set; }
+
         [JsonIgnore]
         public IPEndPoint LocalEndPoint { get; set; }
+        public BaseMessage() { }
+
         public string LocalEndPointString
         {
             get => LocalEndPoint != null ? $"{LocalEndPoint.Address}:{LocalEndPoint.Port}" : "";
@@ -33,6 +33,7 @@ namespace Client
                 }
             }
         }
+
         public string SerializeMessageToJson()
         {
             try
@@ -41,14 +42,12 @@ namespace Client
             }
             catch (Exception e)
             {
-                {
-                    Console.WriteLine(e);
-                }
+                Console.WriteLine(e);
             }
             return "false";
         }
 
-        public static Message? DeserializeFromJson(string json) => JsonSerializer.Deserialize<Message>(json);
+        public static BaseMessage? DeserializeFromJson(string json) => JsonSerializer.Deserialize<DefaultMessage>(json);
 
         public override string? ToString()
         {
@@ -60,9 +59,31 @@ namespace Client
             if (Text != null)
                 sb.Append(Text);
             if (NicknameTo != null)
-                sb.Append("\n"+ NicknameTo);
+                sb.Append("\n" + NicknameTo);
             return sb.ToString();
         }
 
+    }
+    namespace Client.Messages
+    {
+        internal class AskMessage : BaseMessage
+        {
+            public AskMessage()
+            {
+                Ask = true;
+            }
+        }
+
+        internal class DisconnectRequestMessage : BaseMessage
+        {
+            public DisconnectRequestMessage()
+            {
+                DisconnectRequest = true;
+            }
+        }
+
+        internal class EmptyMessage : BaseMessage
+        {
+        }
     }
 }

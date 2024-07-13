@@ -1,42 +1,40 @@
 ﻿using System.Net;
+using Client.Messages;
+using Client.Messages.Fabric;
 
 namespace Client
 {
     internal class Program
     {
         private static CancellationTokenSource cancellationTokenSource = new();
-        public static Stack<Message>? Messages = new();
+        public static Stack<BaseMessage>? Messages = new();
         private static readonly object lockObject = new();
+        private static BaseMessageFabric messageFabric;
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            Message message = new();
             int counter = 0;
-            Messenger client = new Messenger();
-            Server server = new Server();
-            message.LocalEndPoint = server.LocalEndPoint;
+            Messenger messenger = new Messenger();
+            Server server = new Server(cancellationTokenSource, messenger);
 
-            server.IncomingMessage += (Message message) =>
+            server.IncomingMessage += (BaseMessage message) =>
             {
                 Messages.Push(message);
             };
-
-
-
             Task printerTask = Task.Run(() =>
             {
-                Message message = new Message();
+                BaseMessage message1 = new MessageCreatorDefault().FactoryMethod();
                 while (!cTokenStopAll.IsCancellationRequested)
                 {
                     lock (lockObject)
                     {
                         if (Messages.Count > 0)
                         {
-                            message = Messages.Pop();
+                            message1 = Messages.Pop();
                             Console.SetCursorPosition(0, Console.CursorTop);
                             Console.WriteLine(new string(' ', Console.WindowWidth));
                             Console.SetCursorPosition(0, Console.CursorTop - 1);
-                            Console.WriteLine($"[{message.DateTime}] {message.NicknameFrom}: {message.Text}");
+                            Console.WriteLine($"[{message1.DateTime}] {message1.NicknameFrom}: {message1.Text}");
                             Console.Write("Введите сообщение или Exit для выхода: ");
                         }
                         else
@@ -48,23 +46,30 @@ namespace Client
             });
             Task waitingForMessage = Task.Run(server.WaitForAMessage);
             Console.WriteLine("Введите Ваш Ник: ");
+            BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
-            // var serverTask = Task.Run(() => server.RecieverStartAsync());
-            //Себе: Для использования сервера в асинхронном режиме, должен быть новый экземпляр udpClient, передавать нельзя
+            message.LocalEndPoint = server.LocalEndPoint;
+            IPEndPoint endpoint = IPEndPoint.Parse(message.LocalEndPointString);
 
-            // Здесь реализуем паттерн, который фабрика на основе другого класса!!!
+            Console.Write("Введите сообщение или Exit для выхода: ");
             do
             {
-                Console.Write("Введите сообщение или Exit для выхода: ");
                 message.Text = Console.ReadLine();
                 if (message.Text.Equals("Exit"))
+                {
+                    cancellationTokenSource.Cancel();
+                    waitingForMessage.Wait();
+                    printerTask.Wait();
+                    Console.WriteLine("Спасибо за использование, возвращайтесь!");
                     break;
-                Console.Write("Введите для кого сообщение: ");
+                }
+                Console.Write("Введите для кого сообщение (пустое поле - отпр. всем): ");
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
-                await client.SendMessageAsync(message);
+                Console.WriteLine(message.DateTime);
+                await messenger.SendMessageAsync(message);
+                Console.Write("Введите сообщение или Exit для выхода: ");
             } while (true);
         }
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Client.Messages;
 
 namespace Client
 {
@@ -12,12 +13,11 @@ namespace Client
 
         public Messenger()
         {
-            //this.localEndPoint = localEndPoint;
             udpClient = new UdpClient();
         }
 
 
-        public async Task SendMessageAsync(Message message)
+        public async Task SendMessageAsync(BaseMessage message)
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
             string jSonToSend = message.SerializeMessageToJson();

@@ -1,0 +1,16 @@
+﻿namespace Server.Messages
+{
+    internal class DisconnectMessage : BaseMessage
+    {
+        public DisconnectMessage()
+        {
+            DisconnectRequest = true;
+            Ask = true;
+            DisconnectRequest = false;
+            Text = string.Empty;
+            NicknameFrom = string.Empty;
+            NicknameTo = string.Empty;
+            DateTime = new DateTime();
+        }
+    }
+}
