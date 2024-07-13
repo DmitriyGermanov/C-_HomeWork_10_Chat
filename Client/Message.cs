@@ -15,6 +15,7 @@ namespace Client
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
         public bool Ask = false;
+        public bool DisconnectRequest = false;
         [JsonIgnore]
         public IPEndPoint LocalEndPoint { get; set; }
         public string LocalEndPointString

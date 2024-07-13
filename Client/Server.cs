@@ -63,6 +63,7 @@ namespace Client
             {
                 try
                 {
+                    //ToDO: Если ask - true, тогда invoke не делаем и сразу отправляем ответ серверу с ask=true 
                     var receiveTask = udpClient.ReceiveAsync(); 
                     var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
 

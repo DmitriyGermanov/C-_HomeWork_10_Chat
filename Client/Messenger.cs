@@ -3,14 +3,14 @@ using System.Net.Sockets;
 
 namespace Client
 {
-    public class Client : IDisposable
+    public class Messenger : IDisposable
     {
         private IPEndPoint? localEndPoint;
         private UdpClient udpClient;
         private bool disposedValue;
         public UdpClient UdpClient { get => udpClient; set => udpClient = value; }
 
-        public Client()
+        public Messenger()
         {
             //this.localEndPoint = localEndPoint;
             udpClient = new UdpClient();

@@ -6,12 +6,13 @@ namespace Client
     {
         private static CancellationTokenSource cancellationTokenSource = new();
         public static Stack<Message>? Messages = new();
+        private static readonly object lockObject = new();
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             Message message = new();
             int counter = 0;
-            Client client = new Client();
+            Messenger client = new Messenger();
             Server server = new Server();
             message.LocalEndPoint = server.LocalEndPoint;
 
@@ -20,27 +21,28 @@ namespace Client
                 Messages.Push(message);
             };
 
-       /*     server.IncomingMessageCheck += (bool isRecieved, Message message) =>
-            {
-                if (isRecieved)
-                    Console.WriteLine("Сообщение было успешно доставлено!");
-                else
-                    Console.WriteLine("Возможно сообщение не было доставлено, повторите отправку!");
-            };*/
+
 
             Task printerTask = Task.Run(() =>
             {
                 Message message = new Message();
                 while (!cTokenStopAll.IsCancellationRequested)
                 {
-                    if (Messages.Count > 0)
+                    lock (lockObject)
                     {
-                        message = Messages.Pop();
-                        Console.WriteLine(message);
-                    }
-                    else
-                    {
-                        Thread.Sleep(100);
+                        if (Messages.Count > 0)
+                        {
+                            message = Messages.Pop();
+                            Console.SetCursorPosition(0, Console.CursorTop);
+                            Console.WriteLine(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(0, Console.CursorTop - 1);
+                            Console.WriteLine($"[{message.DateTime}] {message.NicknameFrom}: {message.Text}");
+                            Console.Write("Введите сообщение или Exit для выхода: ");
+                        }
+                        else
+                        {
+                            Thread.Sleep(100);
+                        }
                     }
                 }
             });
@@ -53,11 +55,11 @@ namespace Client
             // Здесь реализуем паттерн, который фабрика на основе другого класса!!!
             do
             {
-                Console.WriteLine("Введите сообщение или Exit для выхода: ");
+                Console.Write("Введите сообщение или Exit для выхода: ");
                 message.Text = Console.ReadLine();
                 if (message.Text.Equals("Exit"))
                     break;
-                Console.WriteLine("Введите для кого сообщение: ");
+                Console.Write("Введите для кого сообщение: ");
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
                 await client.SendMessageAsync(message);

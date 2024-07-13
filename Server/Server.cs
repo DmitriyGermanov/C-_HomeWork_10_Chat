@@ -33,10 +33,7 @@ namespace Server
                 {
                     try
                     {
-                        /*               udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient); //Второй вариант асинхронной реализации, возможной для использования с потоком
-                                       await Task.Delay(500);*/
-
-                        var receiveTask = udpClient.ReceiveAsync(); //Первый рабочий вариант реализации
+                        var receiveTask = udpClient.ReceiveAsync(); 
                         var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
 
                         if (completedTask == receiveTask)
@@ -44,7 +41,8 @@ namespace Server
              
                             UdpReceiveResult result = receiveTask.Result;
                             Message? message = messageGetter(receiveTask);
-                            //TODO: Сюда добавляем, если получено сообщение с ASK = true, то мы проверяем у клиента isonline, если false делаем true, если Ask false, то инвокаем, если нет, то не инвокаем
+                            //TODO: Сюда добавляем, если получено сообщение с ASK = true, то мы проверяем у клиента isonline, если false делаем true, если Ask false, то инвокаем, если нет, то не инвокаем.
+                            //TODO: Также добавить проверку на DisconnectRequest, если ASK = true и DisconnectRequest = true, то IsOnline = false;
                             IncomingMessage?.Invoke(message);
 
                         }
@@ -66,37 +64,13 @@ namespace Server
             }
         }
 
-        public void Stop()
-        {
-            cancellationToken.Cancel();
-
-        }
-        private static Message? messageGetter(Task<UdpReceiveResult> receiveTask)
+        public void Stop() => cancellationToken.Cancel();
+           private static Message? messageGetter(Task<UdpReceiveResult> receiveTask)
         {
             var result = receiveTask.Result;
             var messageString = Encoding.UTF8.GetString(result.Buffer);
             var message = Message.DeserializeFromJson(messageString);
             return message;
         }
-     /*   private void ReceiveCallback(IAsyncResult ar)
-        {
-            UdpClient udpClient = (UdpClient)ar.AsyncState;
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
-
-            try
-            {
-                byte[] receiveBytes = udpClient.EndReceive(ar, ref remoteEP);
-                var message = Encoding.UTF8.GetString(receiveBytes);
-                IncomingMessage?.Invoke(message, remoteEP);
-                string responseMessage = "Сообщение получено!";
-                byte[] responseData = Encoding.UTF8.GetBytes(responseMessage);
-                udpClient.Send(responseData, responseData.Length, remoteEP);
-                udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpClient);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }*/
-    }
+        }
 }
