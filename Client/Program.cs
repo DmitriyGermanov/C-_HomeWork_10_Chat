@@ -68,7 +68,7 @@ namespace Client
                 message.DateTime = DateTime.Now;
                 await messenger.SendMessageAsync(message);
             } while (true);
-            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod());
+            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod(message.LocalEndPoint));
             Console.WriteLine("Завершающий метод сработал!");
         }
     }

@@ -59,7 +59,7 @@ namespace Client
                         BaseMessage? message = messageGetter(receiveTask);
                         if (!message.Ask)
                         {
-             
+                            //TODO: убрать проверку условий, вынести все проверки и печат в main
                            IncomingMessage?.Invoke(message);
                         } else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
                         {

@@ -26,7 +26,7 @@ namespace Server
             cToken = cancellationToken.Token;
             this.clientList = clientList;
         }
-            
+
 
         public async Task StartAsync()
         {
@@ -37,39 +37,31 @@ namespace Server
                 {
                     try
                     {
-                        var receiveTask = udpClient.ReceiveAsync(); 
+                        var receiveTask = udpClient.ReceiveAsync();
                         var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
 
                         if (completedTask == receiveTask)
                         {
-             
+
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
-                            Console.WriteLine(message.LocalEndPoint);
                             Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
-                            if (message.Ask && !message.DisconnectRequest)
+
+                            if (client == null && message.LocalEndPoint != null)
                             {
-                               
-                                if (client != null)
-                                {
-                                    if (!client.IsOnline)
-                                    {
-                                        client.IsOnline = true;
-                                        client.AskTime = DateTime.Now;
-                                    }
-                                }
-                            }
-                            else if (message.DisconnectRequest && message.Ask)
-                            {
-                                if (client != null)
-                                {
-                                    clientList.SetClientOffline(client);
-                                    Console.WriteLine(client.IsOnline);
-                                }
-                            }else if (client == null)
-                            {
-                                Task.Run(() => clientList.ClientRegistration(message, IPEndPoint.Parse(message.LocalEndPointString)));
+                                Task.Run(() => clientList.ClientRegistration(message, message.LocalEndPoint));
                                 IncomingMessage?.Invoke(message);
+                            }
+                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.UserIsOnline && !message.DisconnectRequest)
+                            {
+                                client.IsOnline = true;
+                                client.AskTime = DateTime.Now;
+
+                            }
+                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.UserIsOnline && message.DisconnectRequest)
+                            {
+                                clientList.SetClientOffline(client);
+                                Console.WriteLine(client.IsOnline);
                             }
                             else
                             {
@@ -96,12 +88,12 @@ namespace Server
         }
 
         public void Stop() => cancellationToken.Cancel();
-           private static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
+        private static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
         {
             var result = receiveTask.Result;
             var messageString = Encoding.UTF8.GetString(result.Buffer);
             var message = BaseMessage.DeserializeFromJson(messageString);
             return message;
         }
-        }
+    }
 }

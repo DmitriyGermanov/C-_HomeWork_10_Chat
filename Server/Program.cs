@@ -34,7 +34,7 @@ namespace Server
                     {
                         //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
                         BaseMessage message = Messages.Pop();
-                        clientFrom = clientList.GetClientByEndPoint(IPEndPoint.Parse(message.LocalEndPointString));
+                        clientFrom = clientList.GetClientByEndPoint(message.LocalEndPoint);
                         //TODO: Заблокировать возможность использовать ники повторно
                         clientTo = clientList.GetClientByName(message.NicknameTo);
                         if (clientFrom != null && message.NicknameTo == "")
@@ -50,7 +50,7 @@ namespace Server
                             Console.WriteLine("Ок");
                             clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
                         }
-                        else if (clientTo == null)
+                        else if (clientTo == null && clientFrom != null)
                         {
                             clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
                         }

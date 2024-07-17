@@ -11,6 +11,8 @@
             NicknameFrom = string.Empty;
             NicknameTo = string.Empty;
             DateTime = new DateTime();
+            UserDoesNotExist = false;
+            UserIsOnline = false;
         }
 
     }

@@ -36,7 +36,13 @@ namespace Server.Clients
 
         }
         public Client? GetClientByName(string name) => clients.Find(client => client.Name.Equals(name));
-        public Client? GetClientByEndPoint(IPEndPoint clientEndPoint) => clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+        public Client? GetClientByEndPoint(IPEndPoint clientEndPoint)
+        {
+            if (clientEndPoint != null)
+                return clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+            else
+                return null;
+        }
         public bool RemoveClientByEndPoint(IPEndPoint clientEndPoint) => clients.Remove(clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)));
         public bool SetClientOffline(Client client) => client.IsOnline = false;
 
