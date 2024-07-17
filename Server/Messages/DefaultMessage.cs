@@ -5,6 +5,8 @@
         public DefaultMessage() {
             Ask = false;
             DisconnectRequest = false;
+            UserDoesNotExist = false;
+            UserIsOnline = true;
         }
     }
 }

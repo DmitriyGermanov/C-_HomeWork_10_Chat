@@ -1,8 +1,8 @@
 ﻿namespace Server.Messages
 {
-    internal class DisconnectMessage : BaseMessage
+    internal class UserIsOnlineMessage : BaseMessage
     {
-        public DisconnectMessage()
+        public UserIsOnlineMessage()
         {
             DisconnectRequest = true;
             Ask = true;

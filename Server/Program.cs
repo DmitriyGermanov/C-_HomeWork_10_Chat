@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Server.Clients;
 using Server.Messages;
+using Server.Messages.Fabric;
 
 namespace Server
 {
@@ -44,6 +45,15 @@ namespace Server
                         {
                             clientFrom.SendToClient(clientTo, message);
                         }
+                        else if (clientFrom != null && clientTo != null && !clientTo.IsOnline)
+                        {
+                            Console.WriteLine("Ок");
+                            clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
+                        }
+                        else if (clientTo == null)
+                        {
+                            clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
+                        }
                     }
                     else
                     {
@@ -64,10 +74,7 @@ namespace Server
         private static void OnMessageReceived(BaseMessage incomingMessage)
         {
             Messages.Push(incomingMessage);
-            IPEndPoint iPEndPoint = IPEndPoint.Parse(incomingMessage.LocalEndPointString);
-            messenger.EndpointCollector(iPEndPoint);
-            Task.Run(() => clientList.ClientRegistration(incomingMessage, iPEndPoint));
-
+            messenger.EndpointCollector(incomingMessage.LocalEndPoint);
         }
     }
 }

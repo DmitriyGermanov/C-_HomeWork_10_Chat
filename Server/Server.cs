@@ -45,10 +45,11 @@ namespace Server
              
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
-                            
+                            Console.WriteLine(message.LocalEndPoint);
+                            Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
                             if (message.Ask && !message.DisconnectRequest)
                             {
-                                Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
+                               
                                 if (client != null)
                                 {
                                     if (!client.IsOnline)
@@ -60,9 +61,15 @@ namespace Server
                             }
                             else if (message.DisconnectRequest && message.Ask)
                             {
-                                Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
                                 if (client != null)
+                                {
                                     clientList.SetClientOffline(client);
+                                    Console.WriteLine(client.IsOnline);
+                                }
+                            }else if (client == null)
+                            {
+                                Task.Run(() => clientList.ClientRegistration(message, IPEndPoint.Parse(message.LocalEndPointString)));
+                                IncomingMessage?.Invoke(message);
                             }
                             else
                             {

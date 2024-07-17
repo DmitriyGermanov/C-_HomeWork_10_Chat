@@ -1,8 +1,8 @@
-﻿namespace Server.Messages
+﻿namespace Client.Messages
 {
-    internal class DisconnectMessage : BaseMessage
+    internal class UserDoesNotExistMessage : BaseMessage
     {
-        public DisconnectMessage()
+        public UserDoesNotExistMessage()
         {
             DisconnectRequest = true;
             Ask = true;
@@ -10,7 +10,7 @@
             NicknameFrom = string.Empty;
             NicknameTo = string.Empty;
             DateTime = new DateTime();
-            UserDoesNotExist = false;
+            UserDoesNotExist = true;
             UserIsOnline = false;
         }
     }

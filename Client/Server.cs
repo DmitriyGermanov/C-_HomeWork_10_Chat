@@ -59,7 +59,16 @@ namespace Client
                         BaseMessage? message = messageGetter(receiveTask);
                         if (!message.Ask)
                         {
-                            IncomingMessage?.Invoke(message);
+             
+                           IncomingMessage?.Invoke(message);
+                        } else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
+                        {
+                            Console.WriteLine("Получатель не в сети!");
+                        }
+           
+                        else if(message.Ask && message.UserDoesNotExist)
+                        {
+                            Console.WriteLine("Такой получатель не зарегестрирован");
                         }
                         else
                         {

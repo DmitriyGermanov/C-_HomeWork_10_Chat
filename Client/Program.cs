@@ -66,10 +66,10 @@ namespace Client
                 Console.Write("Введите для кого сообщение (пустое поле - отпр. всем): ");
                 message.NicknameTo = Console.ReadLine();
                 message.DateTime = DateTime.Now;
-                Console.WriteLine(message.DateTime);
                 await messenger.SendMessageAsync(message);
-                Console.Write("Введите сообщение или Exit для выхода: ");
             } while (true);
+            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod());
+            Console.WriteLine("Завершающий метод сработал!");
         }
     }
 }

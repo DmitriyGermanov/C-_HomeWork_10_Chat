@@ -13,6 +13,8 @@ namespace Client.Messages
         public string? NicknameTo { get; set; }
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
+        public bool UserIsOnline { get; set; }
+        public bool UserDoesNotExist { get; set; }
 
         [JsonIgnore]
         public IPEndPoint LocalEndPoint { get; set; }
