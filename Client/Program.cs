@@ -49,7 +49,6 @@ namespace Client
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
             message.LocalEndPoint = server.LocalEndPoint;
-            IPEndPoint endpoint = IPEndPoint.Parse(message.LocalEndPointString);
 
             Console.Write("Введите сообщение или Exit для выхода: ");
             do
@@ -68,8 +67,7 @@ namespace Client
                 message.DateTime = DateTime.Now;
                 await messenger.SendMessageAsync(message);
             } while (true);
-            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod(message.LocalEndPoint));
-            Console.WriteLine("Завершающий метод сработал!");
+            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod(server.LocalEndPoint));
         }
     }
 }

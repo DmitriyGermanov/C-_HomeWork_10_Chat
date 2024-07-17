@@ -72,7 +72,7 @@ namespace Client
                         }
                         else
                         {
-                            messenger.SendMessageAsync(new MessageCreatorAsk().FactoryMethod());
+                            messenger.SendMessageAsync(new MessageCreatorAsk().FactoryMethod(LocalEndPoint));
                         }
 
                     }
