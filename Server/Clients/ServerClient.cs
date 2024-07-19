@@ -8,35 +8,59 @@ delete: он удаляет клиента из списка
 если сервер получает имя получателя то он отправляет сообщение одному конкретному клиенту. Код сервера должен выглядеть примерно следующим образом:*/
 namespace Server.Clients
 {
-    class Client : ClientBase
+    internal class ServerClient : ClientBase
     {
-        public Client(Mediator mediator, Messenger messenger) : base(mediator)
+
+        public ServerClient(Mediator mediator, Messenger messenger) : base(mediator)
         {
             this.messenger = messenger;
         }
+        public ServerClient()
+        { }
+
+        private int clientID;
         private string name;
         private IPEndPoint clientEndPoint;
         private DateTime askTime;
         private Messenger messenger;
         private bool isOnline;
+        private List<BaseMessage> messagesTo;
+        private List<BaseMessage> messagesFrom;
         public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
-        public string Name
+        public virtual int ClientID
+        {
+            get { return clientID; }
+            set { clientID = value; }
+        }
+
+        public virtual string Name
         {
             get { return name; }
             set { name = value; }
         }
-        public IPEndPoint ClientEndPoint
-        {
 
+        public virtual IPEndPoint ClientEndPoint
+        {
             get { return clientEndPoint; }
             set { clientEndPoint = value; }
         }
-        public DateTime AskTime
+
+        public virtual DateTime AskTime
         {
             get { return askTime; }
             set { askTime = value; }
         }
 
+        public virtual List<BaseMessage> MessagesFrom
+        {
+            get { return messagesFrom; }
+            set { messagesFrom = value; }
+        }
+        public virtual List<BaseMessage> MessagesTo
+        {
+            get { return messagesTo; }
+            set { messagesTo = value; }
+        }
         public override void Receive(BaseMessage message)
         {
             Task.Run(() =>
@@ -55,7 +79,7 @@ namespace Server.Clients
             return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
         }
 
-        internal void SendToClient(Client? client, BaseMessage message)
+        internal void SendToClient(ServerClient? client, BaseMessage message)
         {
             messenger.AnswerSender(message, client.ClientEndPoint);
         }

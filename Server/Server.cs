@@ -6,10 +6,10 @@ using System.Text;
 
 namespace Server
 {
-    public delegate void ServerDelegate(BaseMessage message);
+    internal delegate void ServerDelegate(BaseMessage message);
     public class Server
     {
-        public event ServerDelegate? IncomingMessage;
+        internal event ServerDelegate? IncomingMessage;
 
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
@@ -31,7 +31,7 @@ namespace Server
         public async Task StartAsync()
         {
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
-            using (UdpClient udpClient = new UdpClient(12345))
+            using (System.Net.Sockets.UdpClient udpClient = new System.Net.Sockets.UdpClient(12345))
             {
                 while (!cToken.IsCancellationRequested)
                 {
@@ -45,7 +45,7 @@ namespace Server
 
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
-                            Client client = clientList.GetClientByEndPoint(message.LocalEndPoint);
+                            Clients.ServerClient client = clientList.GetClientByEndPoint(message.LocalEndPoint);
 
                             if (client == null && message.LocalEndPoint != null)
                             {

@@ -11,8 +11,9 @@ namespace Server
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
         private Stack<IPEndPoint> endPoints;
-        public Stack<IPEndPoint> EndPoints => endPoints;
+        public virtual Stack<IPEndPoint> EndPoints => endPoints;
         private BaseMessage message;
+        public virtual int MessengerID { get; set; }
         public Messenger()
         {
             cancellationToken = new CancellationTokenSource();
@@ -25,7 +26,7 @@ namespace Server
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
         }
-        public Messenger(CancellationTokenSource cancellationToken, BaseMessage message)
+        internal Messenger(CancellationTokenSource cancellationToken, BaseMessage message)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
@@ -62,7 +63,7 @@ namespace Server
                 }
             }
         }
-        public async Task AnswerSender(BaseMessage message, IPEndPoint clientEndpoint)
+        internal async Task AnswerSender(BaseMessage message, IPEndPoint clientEndpoint)
         {
             using (UdpClient udpClient = new UdpClient())
             {

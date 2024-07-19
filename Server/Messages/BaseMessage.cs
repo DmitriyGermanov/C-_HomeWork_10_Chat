@@ -1,20 +1,28 @@
-﻿using System.Net;
+﻿using Server.Clients;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Server.Messages
 {
-    public abstract class BaseMessage
+    internal abstract class BaseMessage
     {
+        public int MessageID { get; set; }
         public string? Text { get; set; }
         public DateTime DateTime { get; set; }
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
+        public int? UserIDFrom { get; set; }
+        public int? UserIdTo {  get; set; }
+        public ServerClient ClientFrom {  get; set; }
+        public ServerClient ClientTo { get; set; }
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }
         public bool UserDoesNotExist { get; set; }  
+
+
 
 
         [JsonIgnore]

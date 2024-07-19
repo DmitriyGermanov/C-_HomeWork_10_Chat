@@ -18,8 +18,8 @@ namespace Server
             clientList = new ClientList();
             //TODO: Заменить этот вызов на фабричный
             messenger = new Messenger();
-            Client clientFrom = new(clientList, messenger);
-            Client clientTo = new(clientList, messenger);
+            ServerClient clientFrom = new(clientList, messenger);
+            ServerClient clientTo = new(clientList, messenger);
             Server server = new Server(cancellationTokenSource, clientList);
             messenger = new Messenger(cancellationTokenSource);
             server.IncomingMessage += OnMessageReceived;

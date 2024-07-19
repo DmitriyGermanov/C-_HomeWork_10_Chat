@@ -7,23 +7,21 @@ namespace Server.Clients
     {
         //TODO: Для базы нужен будет синглтон
         //TODO: Переделываем на Dictionary<Client, Stack<Message> Логика: для каждого Client в Dictionary копим Stack Message, если клиент IsOnline держим Stack.Count = 0, если клиент IsOffline копим Stack (при смене статуса отдельным методом опустошаем Stack). Если статус Client IsOffline, то Server не делает Invoke и передает управление накопительному методу, если статус Client IsOnline, то делается Invoke => message поступает в Program, Client отправитель записывается в ClientFrom. Метод проверяет есть ли в Stack этого клиента message и освобождает Stack отправляя messages клиенту.
-        private List<Client> clients;
-        private Messenger messenger;
+        public  Messenger Messenger;
    
 
         public ClientList()
         {
-            clients = new();
-            messenger = new Messenger();
+            Clients = new();
+            Messenger = new Messenger();
         }
 
-        public List<Client> Clients => clients;
-        public void ClientRegistration(BaseMessage message, IPEndPoint clientEndPoint)
+        public virtual void ClientRegistration(BaseMessage message, IPEndPoint clientEndPoint)
         {
-            Client client = clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+            ServerClient client = Clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
             if (client == null)
             {
-                clients.Add(new Client(this, messenger) { Name = message.NicknameFrom, ClientEndPoint = clientEndPoint, AskTime = DateTime.Now, IsOnline = true });
+                Clients.Add(new ServerClient(this, Messenger) { Name = message.NicknameFrom, ClientEndPoint = clientEndPoint, AskTime = DateTime.Now, IsOnline = true });
 
             } else
             {
@@ -35,22 +33,22 @@ namespace Server.Clients
             }
 
         }
-        public Client? GetClientByName(string name) => clients.Find(client => client.Name.Equals(name));
-        public Client? GetClientByEndPoint(IPEndPoint clientEndPoint)
+        public ServerClient? GetClientByName(string name) => Clients.Find(client => client.Name.Equals(name));
+        public ServerClient? GetClientByEndPoint(IPEndPoint clientEndPoint)
         {
             if (clientEndPoint != null)
-                return clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+                return Clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
             else
                 return null;
         }
-        public bool RemoveClientByEndPoint(IPEndPoint clientEndPoint) => clients.Remove(clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)));
-        public bool SetClientOffline(Client client) => client.IsOnline = false;
+        public bool RemoveClientByEndPoint(IPEndPoint clientEndPoint) => Clients.Remove(Clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)));
+        public bool SetClientOffline(ServerClient client) => client.IsOnline = false;
 
-        public override void Send(BaseMessage message, Client client)
+        public override void Send(BaseMessage message, ServerClient client)
         {
             if (client != null)
             {
-                clients.ForEach(thisClient =>
+                Clients.ForEach(thisClient =>
                 {
                     if (thisClient != client)
                         thisClient.Receive(message);
