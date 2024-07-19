@@ -61,6 +61,20 @@ namespace Server.Clients
             get { return messagesTo; }
             set { messagesTo = value; }
         }
+        public virtual string IpEndPointToString
+        {
+            get { return clientEndPoint.ToString(); }
+            set
+            {
+                try
+                {
+                    clientEndPoint = IPEndPoint.Parse(value);
+                } catch
+                {
+                    throw new Exception("Ошибка преобразования");
+                }
+            }
+        }
         public override void Receive(BaseMessage message)
         {
             Task.Run(() =>

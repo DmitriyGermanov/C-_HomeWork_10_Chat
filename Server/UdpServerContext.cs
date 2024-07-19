@@ -35,6 +35,7 @@ namespace Server
                     .HasDefaultValue(false);
                     entity.Property(e => e.AskTime);
                     entity.Ignore(e => e.ClientEndPoint);
+                    entity.Property(e => e.IpEndPointToString);
 
                 }
                 );

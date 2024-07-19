@@ -10,12 +10,12 @@ namespace Server
         private static CancellationTokenSource cancellationTokenSource = new();
         public static Stack<BaseMessage>? Messages = new();
         private static Messenger? messenger;
-        private static ClientList clientList;
+        private static ClientsInDb clientList;
         static void Main(string[] args)
         {
             //TODO: Сделать фабрику клиентов
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            clientList = new ClientList();
+            clientList = new ClientsInDb();
             //TODO: Заменить этот вызов на фабричный
             messenger = new Messenger();
             ServerClient clientFrom = new(clientList, messenger);

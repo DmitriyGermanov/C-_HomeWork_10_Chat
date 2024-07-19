@@ -10,7 +10,7 @@ namespace Server.Clients
             using (var ctx = new UdpServerContext())
             {
 
-                foreach (var item in ctx.Clients)
+/*                foreach (var item in ctx?.Clients)
                 {
                     if (item.Name.Equals(message.NicknameFrom))
                     {
@@ -18,11 +18,12 @@ namespace Server.Clients
                         flag = true;
                         break;
                     }
-                }
+                }*/
                 if (!flag)
                 {
-                    ctx.Clients.Add(new ServerClient(this, base.Messenger) { Name = message.NicknameFrom, AskTime = DateTime.Now, IsOnline = true});
+                    ctx.Clients.Add(new ServerClient(this, base.Messenger) { Name = message.NicknameFrom, AskTime = DateTime.Now, IsOnline = true, IpEndPointToString = message.LocalEndPointString});
                 }
+                ctx.SaveChanges();
             }
         }
     }

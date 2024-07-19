@@ -13,14 +13,14 @@ namespace Server
 
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
-        private ClientList clientList;
+        private ClientsInDb clientList;
 
         public Server()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        internal Server(CancellationTokenSource cancellationToken, ClientList clientList)
+        internal Server(CancellationTokenSource cancellationToken, ClientsInDb clientList)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
@@ -49,7 +49,7 @@ namespace Server
 
                             if (client == null && message.LocalEndPoint != null)
                             {
-                                Task.Run(() => clientList.ClientRegistration(message, message.LocalEndPoint));
+                                Task.Run(() => clientList.ClientRegistration(message));
                                 IncomingMessage?.Invoke(message);
                             }
                             else if (client != null && message.Ask && !message.UserDoesNotExist && !message.UserIsOnline && !message.DisconnectRequest)
