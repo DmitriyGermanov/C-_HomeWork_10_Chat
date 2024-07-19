@@ -6,24 +6,20 @@ namespace Server.Clients
     {
         public void ClientRegistration(BaseMessage message)
         {
-            bool flag = false;
             using (var ctx = new UdpServerContext())
             {
-
-/*                foreach (var item in ctx?.Clients)
+                Console.WriteLine("1");
+                var existingClient = ctx.Clients.FirstOrDefault(c => c.Name == message.NicknameFrom);
+                if (existingClient != null)
                 {
-                    if (item.Name.Equals(message.NicknameFrom))
-                    {
-                        item.IsOnline = true;
-                        flag = true;
-                        break;
-                    }
-                }*/
-                if (!flag)
-                {
-                    ctx.Clients.Add(new ServerClient(this, base.Messenger) { Name = message.NicknameFrom, AskTime = DateTime.Now, IsOnline = true, IpEndPointToString = message.LocalEndPointString});
+                    existingClient.IsOnline = true;
                 }
-                ctx.SaveChanges();
+                else
+                {
+                    Console.WriteLine("2");
+                    ctx.Clients.Add(new ServerClient(this, base.Messenger) { Name = message.NicknameFrom, AskTime = DateTime.Now, IsOnline = true, IpEndPointToString = message.LocalEndPointString });
+                    ctx.SaveChanges();
+                }
             }
         }
     }
