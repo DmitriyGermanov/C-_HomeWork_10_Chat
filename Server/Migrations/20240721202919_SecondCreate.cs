@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace Server.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class SecondCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,50 +16,19 @@ namespace Server.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Mediator",
-                columns: table => new
-                {
-                    MediatorID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("mediator_pkey", x => x.MediatorID);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Messenger",
-                columns: table => new
-                {
-                    MessengerID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("messenger_pkey", x => x.MessengerID);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "clients",
                 columns: table => new
                 {
-                    ClientID = table.Column<int>(type: "int", nullable: false),
+                    ClientID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     IsOnline = table.Column<sbyte>(type: "tinyint", nullable: false, defaultValue: (sbyte)0),
                     Name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
-                    AskTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    AskTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IpEndPointToString = table.Column<string>(type: "longtext", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("user_pkey", x => x.ClientID);
-                    table.ForeignKey(
-                        name: "FK_clients_Mediator_ClientID",
-                        column: x => x.ClientID,
-                        principalTable: "Mediator",
-                        principalColumn: "MediatorID",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -92,6 +61,12 @@ namespace Server.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_clients_ClientID",
+                table: "clients",
+                column: "ClientID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_clients_Name",
                 table: "clients",
                 column: "Name",
@@ -115,13 +90,7 @@ namespace Server.Migrations
                 name: "messages");
 
             migrationBuilder.DropTable(
-                name: "Messenger");
-
-            migrationBuilder.DropTable(
                 name: "clients");
-
-            migrationBuilder.DropTable(
-                name: "Mediator");
         }
     }
 }

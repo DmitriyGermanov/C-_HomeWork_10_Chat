@@ -22,30 +22,10 @@ namespace Server.Migrations
                 .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Server.Clients.Mediator", b =>
-                {
-                    b.Property<int>("MediatorID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("varchar(13)");
-
-                    b.HasKey("MediatorID")
-                        .HasName("mediator_pkey");
-
-                    b.ToTable("Mediator");
-
-                    b.HasDiscriminator().HasValue("Mediator");
-
-                    b.UseTphMappingStrategy();
-                });
-
             modelBuilder.Entity("Server.Clients.ServerClient", b =>
                 {
                     b.Property<int>("ClientID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("AskTime")
@@ -68,6 +48,9 @@ namespace Server.Migrations
 
                     b.HasKey("ClientID")
                         .HasName("user_pkey");
+
+                    b.HasIndex("ClientID")
+                        .IsUnique();
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -114,41 +97,11 @@ namespace Server.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Server.Messenger", b =>
-                {
-                    b.Property<int>("MessengerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.HasKey("MessengerID")
-                        .HasName("messenger_pkey");
-
-                    b.ToTable("Messenger");
-                });
-
-            modelBuilder.Entity("Server.Clients.ClientList", b =>
-                {
-                    b.HasBaseType("Server.Clients.Mediator");
-
-                    b.HasDiscriminator().HasValue("ClientList");
-                });
-
             modelBuilder.Entity("Server.Messages.DefaultMessage", b =>
                 {
                     b.HasBaseType("Server.Messages.BaseMessage");
 
                     b.HasDiscriminator().HasValue("DefaultMessage");
-                });
-
-            modelBuilder.Entity("Server.Clients.ServerClient", b =>
-                {
-                    b.HasOne("Server.Clients.Mediator", "Mediator")
-                        .WithMany("Clients")
-                        .HasForeignKey("ClientID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Mediator");
                 });
 
             modelBuilder.Entity("Server.Messages.BaseMessage", b =>
@@ -164,11 +117,6 @@ namespace Server.Migrations
                     b.Navigation("ClientFrom");
 
                     b.Navigation("ClientTo");
-                });
-
-            modelBuilder.Entity("Server.Clients.Mediator", b =>
-                {
-                    b.Navigation("Clients");
                 });
 
             modelBuilder.Entity("Server.Clients.ServerClient", b =>

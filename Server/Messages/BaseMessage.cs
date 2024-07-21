@@ -15,8 +15,8 @@ namespace Server.Messages
         public string? NicknameTo { get; set; }
         public int? UserIDFrom { get; set; }
         public int? UserIdTo {  get; set; }
-        public ServerClient ClientFrom {  get; set; }
-        public ServerClient ClientTo { get; set; }
+        public virtual ServerClient ClientTo { get; set; }
+        public virtual ServerClient ClientFrom { get; set; }
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }

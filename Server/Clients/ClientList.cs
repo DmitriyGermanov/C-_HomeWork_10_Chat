@@ -12,7 +12,7 @@ namespace Server.Clients
 
         public ClientList()
         {
-            Clients = new();
+            Clients = new List<ServerClient>();   
             Messenger = new Messenger();
         }
 
@@ -21,7 +21,7 @@ namespace Server.Clients
             ServerClient client = Clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
             if (client == null)
             {
-                Clients.Add(new ServerClient(this, Messenger) { Name = message.NicknameFrom, ClientEndPoint = clientEndPoint, AskTime = DateTime.Now, IsOnline = true });
+                Clients.Add(new ServerClient() { Name = message.NicknameFrom, ClientEndPoint = clientEndPoint, AskTime = DateTime.Now, IsOnline = true });
 
             } else
             {

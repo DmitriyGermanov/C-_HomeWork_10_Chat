@@ -13,10 +13,7 @@ namespace Server.Clients
     internal class ServerClient : ClientBase
     {
 
-        public ServerClient(Mediator mediator, Messenger messenger) : base(mediator)
-        {
-            this.messenger = messenger;
-        }
+       
         public ServerClient()
         { }
 
@@ -24,10 +21,9 @@ namespace Server.Clients
         private string name;
         private IPEndPoint clientEndPoint;
         private DateTime askTime;
-        private Messenger messenger;
         private bool isOnline;
-        private List<BaseMessage> messagesTo;
-        private List<BaseMessage> messagesFrom;
+        public virtual ICollection<BaseMessage> MessagesTo { get; set; }
+        public virtual ICollection<BaseMessage> MessagesFrom { get; set; }
         public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
         public virtual int ClientID
         {
@@ -53,16 +49,8 @@ namespace Server.Clients
             set { askTime = value; }
         }
 
-        public virtual List<BaseMessage> MessagesFrom
-        {
-            get { return messagesFrom; }
-            set { messagesFrom = value; }
-        }
-        public virtual List<BaseMessage> MessagesTo
-        {
-            get { return messagesTo; }
-            set { messagesTo = value; }
-        }
+
+
         public virtual string IpEndPointToString
         {
             get { return clientEndPoint.ToString(); }
@@ -71,7 +59,8 @@ namespace Server.Clients
                 try
                 {
                     clientEndPoint = IPEndPoint.Parse(value);
-                } catch
+                }
+                catch
                 {
                     throw new Exception("Ошибка преобразования");
                 }
@@ -81,11 +70,11 @@ namespace Server.Clients
         {
             Task.Run(() =>
             {
-                messenger.AnswerSender(message, ClientEndPoint);
+                new Messenger().AnswerSender(message, ClientEndPoint);
             });
         }
 
-        public override void Send(BaseMessage message)
+        public override void Send(BaseMessage message, Mediator mediator)
         {
             mediator.Send(message, this);
         }
@@ -97,7 +86,8 @@ namespace Server.Clients
 
         internal void SendToClient(ServerClient? client, BaseMessage message)
         {
-            messenger.AnswerSender(message, client.ClientEndPoint);
+            Console.WriteLine(client.clientEndPoint);
+            new Messenger().AnswerSender(message, client.ClientEndPoint);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using MySqlX.XDevAPI;
 using Server.Clients;
 using Server.Messages;
 using Server.Messages.Fabric;
@@ -13,14 +14,13 @@ namespace Server
         private static ClientsInDb clientList;
         static void Main(string[] args)
         {
-            //TODO: Сделать фабрику клиентов
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             clientList = new ClientsInDb();
-            //TODO: Заменить этот вызов на фабричный
             messenger = new Messenger();
-            ServerClient clientFrom = new(clientList, messenger);
-            ServerClient clientTo = new(clientList, messenger);
-            Server server = new Server(cancellationTokenSource, clientList);
+            ServerClient clientFrom = new();
+            ServerClient clientTo = new();
+            MessagesInDB messagesInDB = new();
+            Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
             messenger = new Messenger(cancellationTokenSource);
             server.IncomingMessage += OnMessageReceived;
             bool threadFlag = true;
@@ -34,12 +34,13 @@ namespace Server
                     {
                         //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
                         BaseMessage message = Messages.Pop();
-                        clientFrom = clientList.GetClientByEndPoint(message.LocalEndPoint);
+                        clientFrom = clientList.GetClientByNameFromDb(message.NicknameFrom);
                         //TODO: Заблокировать возможность использовать ники повторно
-                        clientTo = clientList.GetClientByName(message.NicknameTo);
+                        clientTo = clientList.GetClientByNameFromDb(message.NicknameTo);
+    
                         if (clientFrom != null && message.NicknameTo == "")
                         {
-                            clientFrom.Send(message);
+                            clientFrom.Send(message, clientList);
                         }
                         else if (clientFrom != null && clientTo != null && clientTo.IsOnline)
                         {
@@ -47,8 +48,9 @@ namespace Server
                         }
                         else if (clientFrom != null && clientTo != null && !clientTo.IsOnline)
                         {
-                            Console.WriteLine("Ок");
                             clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
+                            message.ClientTo = clientTo;
+                            messagesInDB.SaveMessageToDb(message);
                         }
                         else if (clientTo == null && clientFrom != null)
                         {

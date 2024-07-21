@@ -14,17 +14,19 @@ namespace Server
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
         private ClientsInDb clientList;
+        private MessagesInDB messagesInDb;
 
         public Server()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        internal Server(CancellationTokenSource cancellationToken, ClientsInDb clientList)
+        internal Server(CancellationTokenSource cancellationToken, ClientsInDb clientList, MessagesInDB messagesInDb)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
             this.clientList = clientList;
+            this.messagesInDb = messagesInDb;
         }
 
 
@@ -39,29 +41,31 @@ namespace Server
                     {
                         var receiveTask = udpClient.ReceiveAsync();
                         var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
-
                         if (completedTask == receiveTask)
                         {
-
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
-                            Clients.ServerClient client = clientList.GetClientByEndPoint(message.LocalEndPoint);
-
+                            ServerClient client = clientList.GetClientByNameFromDb(message.NicknameFrom);
+                            if (client!=null)
+                                clientList.SetClientAskTimeInDb(client, message);
                             if (client == null && message.LocalEndPoint != null)
                             {
-                                Task.Run(() => clientList.ClientRegistration(message));
+                                clientList.ClientRegistrationInDb(message);
                                 IncomingMessage?.Invoke(message);
                             }
-                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.UserIsOnline && !message.DisconnectRequest)
+                            else if (client != null && !client.IsOnline && !message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
                             {
-                                client.IsOnline = true;
-                                client.AskTime = DateTime.Now;
-
+                                
+                                //messagesInDb.ShowUnrecievedMessages(client);
+                                IncomingMessage?.Invoke(message);
                             }
-                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.UserIsOnline && message.DisconnectRequest)
+                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
                             {
-                                clientList.SetClientOffline(client);
-                                Console.WriteLine(client.IsOnline);
+                                clientList.SetClientAskTimeInDb(client, message);
+                            }
+                            else if (client != null && message.Ask && !message.UserDoesNotExist && message.DisconnectRequest)
+                            {
+                                clientList.SetClientOfflineInDb(client);
                             }
                             else
                             {
