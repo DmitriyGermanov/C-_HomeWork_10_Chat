@@ -37,7 +37,7 @@ namespace Server
         {
             endPoints.Push(endPoint);
         }
-
+//To-do:1. Правильно именовать метод, перенести метод отправки отложенных сообщений и просто сообщений сюда же
         public async Task Sender()
         {
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
