@@ -1,6 +1,7 @@
 ﻿using Server.Messages;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 /*GabilyAslanov: Мы собираемся сделать наш класс полностью клиент-серверным с возможностью отправки данных сразу нескольким клиентам. Доработаем наш код следующим образом. Представьте что наш сервер умеет работать как медиатор (умеет отправлять сообщения по имени клиента), а также умеет возвращать список всех подключенных к нему клиентов. Для этого доработаем наш класс сообщений добавив поле ToName.
 GabilyAslanov: Доработаем систему команд. Имя пользователя сервера всегда будет Server. Если сервер получает команду (как текст сообщения):
 register: то он добавляет клиента в свой список.
@@ -13,7 +14,7 @@ namespace Server.Clients
     internal class ServerClient : ClientBase
     {
 
-       
+
         public ServerClient()
         { }
 
@@ -22,7 +23,9 @@ namespace Server.Clients
         private IPEndPoint clientEndPoint;
         private DateTime askTime;
         private bool isOnline;
+        [JsonIgnore]
         public virtual ICollection<BaseMessage> MessagesTo { get; set; }
+        [JsonIgnore]
         public virtual ICollection<BaseMessage> MessagesFrom { get; set; }
         public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
         public virtual int ClientID
@@ -53,24 +56,26 @@ namespace Server.Clients
 
         public virtual string IpEndPointToString
         {
-            get { return clientEndPoint.ToString(); }
+            get { return clientEndPoint?.ToString(); }
             set
             {
-                try
+                /*if (IPEndPoint.TryParse(value, out var result)) 
                 {
-                    clientEndPoint = IPEndPoint.Parse(value);
+                    clientEndPoint = result;
                 }
-                catch
+                else
                 {
                     throw new Exception("Ошибка преобразования");
-                }
+                }*/
+                if (IPEndPoint.TryParse(value, out var result))
+                    clientEndPoint = result;
             }
         }
         public override void Receive(BaseMessage message)
         {
             Task.Run(() =>
             {
-                new Messenger().AnswerSender(message, ClientEndPoint);
+                Messenger.AnswerSenderAsync(message, ClientEndPoint);
             });
         }
 
@@ -84,10 +89,7 @@ namespace Server.Clients
             return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
         }
 
-        internal void SendToClient(ServerClient? client, BaseMessage message)
-        {
-            Console.WriteLine(client.clientEndPoint);
-            new Messenger().AnswerSender(message, client.ClientEndPoint);
-        }
+        internal async Task SendToClientAsync(ServerClient? client, BaseMessage message) => await Messenger.AnswerSenderAsync(message, client.ClientEndPoint);
+
     }
 }

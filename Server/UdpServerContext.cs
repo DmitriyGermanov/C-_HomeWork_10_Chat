@@ -54,7 +54,7 @@ namespace Server
                                  .HasForeignKey(e => e.UserIdTo);
                     entity.HasOne(e => e.ClientFrom)
                                 .WithMany(e => e.MessagesFrom)
-                                 .HasForeignKey(e => e.UserIDFrom);
+                                 .HasForeignKey(e => e.UserIDFrom); 
                     entity.Ignore(e => e.Ask);
                     entity.Ignore(e => e.DisconnectRequest);
                     entity.Ignore(e => e.LocalEndPoint);

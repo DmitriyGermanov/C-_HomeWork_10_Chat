@@ -19,9 +19,9 @@ namespace Server
             messenger = new Messenger();
             ServerClient clientFrom = new();
             ServerClient clientTo = new();
-            MessagesInDB messagesInDB = new();
-            Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
             messenger = new Messenger(cancellationTokenSource);
+            MessagesInDB messagesInDB = new(messenger, clientList);
+            Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
             server.IncomingMessage += OnMessageReceived;
             bool threadFlag = true;
             Task serverTask = Task.Run(server.StartAsync);
@@ -44,17 +44,18 @@ namespace Server
                         }
                         else if (clientFrom != null && clientTo != null && clientTo.IsOnline)
                         {
-                            clientFrom.SendToClient(clientTo, message);
+                            clientFrom.SendToClientAsync(clientTo, message);
                         }
                         else if (clientFrom != null && clientTo != null && !clientTo.IsOnline)
                         {
-                            clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
+                            clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
                             message.ClientTo = clientTo;
+                            message.ClientFrom = clientFrom;
                             messagesInDB.SaveMessageToDb(message);
                         }
                         else if (clientTo == null && clientFrom != null)
                         {
-                            clientFrom.SendToClient(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
+                            clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
                         }
                     }
                     else

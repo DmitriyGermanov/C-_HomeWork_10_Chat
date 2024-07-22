@@ -46,17 +46,17 @@ namespace Server
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
                             ServerClient client = clientList.GetClientByNameFromDb(message.NicknameFrom);
-                            if (client!=null)
+                            if (client!=null && client.IsOnline && !message.DisconnectRequest)
                                 clientList.SetClientAskTimeInDb(client, message);
                             if (client == null && message.LocalEndPoint != null)
                             {
                                 clientList.ClientRegistrationInDb(message);
                                 IncomingMessage?.Invoke(message);
                             }
-                            else if (client != null && !client.IsOnline && !message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
+                            else if (client != null && !client.IsOnline && !message.Ask)
                             {
-                                
-                                //messagesInDb.ShowUnrecievedMessages(client);
+                                clientList.SetClientAskTimeInDb(client, message);
+                                messagesInDb.ShowUnrecievedMessagesAsync(client);
                                 IncomingMessage?.Invoke(message);
                             }
                             else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)

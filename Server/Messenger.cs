@@ -63,14 +63,14 @@ namespace Server
                 }
             }
         }
-        internal async Task AnswerSender(BaseMessage message, IPEndPoint clientEndpoint)
+        internal async static Task AnswerSenderAsync(BaseMessage message, IPEndPoint clientEndpoint)
         {
             using (UdpClient udpClient = new UdpClient())
             {
                 //Console.WriteLine("Отправляю сообщение для" + clientEndpoint);
                 string jSonToSend = message.SerializeMessageToJson();
                 byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
-                await udpClient.SendAsync(responseData, responseData.Length, clientEndpoint);
+               await udpClient.SendAsync(responseData, responseData.Length, clientEndpoint);
             }
         }
     }

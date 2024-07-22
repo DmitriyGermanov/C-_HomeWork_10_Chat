@@ -7,6 +7,7 @@ namespace Server.Clients
     {
         public void ClientRegistrationInDb(BaseMessage message)
         {
+            Console.WriteLine("сработал ClientReg");
             using (var ctx = new UdpServerContext())
             {
                 var existingClient = ctx.Clients.FirstOrDefault(c => c.Name.Equals(message.NicknameFrom));
@@ -40,19 +41,25 @@ namespace Server.Clients
                 return ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
             }
         }
+        public ServerClient GetClientByIFromDb(int? clientId)
+        {
+            using (var ctx = new UdpServerContext())
+            {
+                return ctx.Clients.FirstOrDefault(c => c.ClientID == clientId);
+            }
+        }
 
         public void SetClientAskTimeInDb(ServerClient client, BaseMessage message)
         {
-            Console.WriteLine("Ура, сработал");
+            Console.WriteLine("сработал SetClientAskTimeInDb");
             using (var ctx = new UdpServerContext())
             {
-
                 if (client != null)
                 {
                     ctx.Attach(client);
                     client.IsOnline = true;
                     client.AskTime = DateTime.Now;
-                    client.ClientEndPoint = message.LocalEndPoint;
+                    client.IpEndPointToString = message.LocalEndPointString;
                     ctx.SaveChanges();
                 }
                 else
@@ -64,6 +71,7 @@ namespace Server.Clients
 
         internal void SetClientOfflineInDb(ServerClient client)
         {
+            Console.WriteLine("сработал SetClientOfflineInDb");
             using (var ctx = new UdpServerContext())
             {
                 if (client != null)
@@ -80,7 +88,7 @@ namespace Server.Clients
         }
         public override void Send(BaseMessage message, ServerClient client)
         {
-            Console.WriteLine("Uses Send to all!");
+            Console.WriteLine("сработал SendToAll");
             using (var ctx = new UdpServerContext())
             {
                 if (client != null)
@@ -95,6 +103,7 @@ namespace Server.Clients
                 }
             }
         }
+
 
     }
 }
