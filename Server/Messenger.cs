@@ -3,7 +3,7 @@ using Server.Messages.Fabric;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
+//TO DO: связать через интерфейс
 namespace Server
 {
     public class Messenger
