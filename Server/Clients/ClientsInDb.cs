@@ -1,6 +1,6 @@
 ﻿using Org.BouncyCastle.Tls;
 using Server.Messages;
-
+//to-do: наследоваться от медиатора, переделпать связи в остальном части кода
 namespace Server.Clients
 {
     internal class ClientsInDb : ClientList
