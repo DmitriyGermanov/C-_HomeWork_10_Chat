@@ -88,7 +88,7 @@ namespace Server.Clients
         {
             return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
         }
-
+//To-do: убрать, оставить только в messenger
         internal async Task SendToClientAsync(ServerClient? client, BaseMessage message) => await Messenger.AnswerSenderAsync(message, client.ClientEndPoint);
 
     }
