@@ -16,7 +16,7 @@ namespace Server.Messages
             this.clientsInDb = clientsInDb;
         }
 
-        internal void SaveMessageToDb(BaseMessage baseMessage)
+        internal static void SaveMessageToDb(BaseMessage baseMessage)
         {
             using (var ctx = new UdpServerContext())
             {

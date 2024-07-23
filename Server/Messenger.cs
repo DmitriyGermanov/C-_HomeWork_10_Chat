@@ -1,4 +1,5 @@
-﻿using Server.Messages;
+﻿using Server.Clients;
+using Server.Messages;
 using Server.Messages.Fabric;
 using System.Net;
 using System.Net.Sockets;
@@ -14,17 +15,20 @@ namespace Server
         public virtual Stack<IPEndPoint> EndPoints => endPoints;
         private BaseMessage message;
         public virtual int MessengerID { get; set; }
+        private static Stack<BaseMessage>? messages = new();
+        private ClientsInDb clientList;
         public Messenger()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
         }
-        public Messenger(CancellationTokenSource cancellationToken)
+        internal Messenger(CancellationTokenSource cancellationToken, ClientsInDb clientList)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
+            this.clientList = clientList;
         }
         internal Messenger(CancellationTokenSource cancellationToken, BaseMessage message)
         {
@@ -33,16 +37,52 @@ namespace Server
             endPoints = new Stack<IPEndPoint>();
             this.message = message;
         }
-        public void EndpointCollector(IPEndPoint endPoint)
+        public void EndpointCollector(IPEndPoint endPoint) => endPoints.Push(endPoint);
+        internal void MessagesCollector(BaseMessage message) => messages.Push(message);
+
+        public async Task SendMessagesFromRow()
         {
-            endPoints.Push(endPoint);
+            ServerClient clientFrom = new();
+            ServerClient clientTo = new();
+            while (!cToken.IsCancellationRequested)
+            {
+                if (messages.Count > 0)
+                {
+                    //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
+                    BaseMessage message = messages.Pop();
+                    clientFrom = clientList.GetClientByNameFromDb(message.NicknameFrom);
+                    //TODO: Заблокировать возможность использовать ники повторно
+                    clientTo = clientList.GetClientByNameFromDb(message.NicknameTo);
+
+                    if (clientFrom != null && message.NicknameTo == "")
+                    {
+                        clientFrom.Send(message, clientList);
+                    }
+                    else if (clientFrom != null && clientTo != null && clientTo.IsOnline)
+                    {
+                        clientFrom.SendToClientAsync(clientTo, message);
+                    }
+                    else if (clientFrom != null && clientTo != null && !clientTo.IsOnline)
+                    {
+                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
+                        message.ClientTo = clientTo;
+                        message.ClientFrom = clientFrom;
+                        MessagesInDB.SaveMessageToDb(message);
+                    }
+                    else if (clientTo == null && clientFrom != null)
+                    {
+                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(100);
+                }
+            }
         }
-//To-do:1. Правильно именовать метод, перенести метод отправки отложенных сообщений и просто сообщений сюда же
-        public async Task Sender()
+        public async Task SendAnswerFromEndpointRow()
         {
-            BaseMessage message = new MessageCreatorDefault().FactoryMethod();
-            message.Text= "Сообщение получено сервером!";
-            message.DateTime= DateTime.Now;
+            BaseMessage message = new MessageCreatorDefault().FactoryMethodWIthText("Сообщение было получено сервером");
             using (UdpClient udpClient = new UdpClient())
             {
                 {
