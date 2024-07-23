@@ -17,18 +17,14 @@ namespace Server
             Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);
-            Task messengerTask = Task.Run(() => messenger.SendAnswerFromEndpointRow());
-            Task printerTask = Task.Run(() =>
-            {
-   
-            });
-
+            Task messengerAnswerToEndpointsRow = Task.Run(() => messenger.SendAnswerFromEndpointRow());
+            Task messengerAnswerToMessageRow = Task.Run(() => messenger.SendMessagesFromRow());
             Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
             Console.ReadKey();
             cancellationTokenSource.Cancel();
-            printerTask.Wait();
+            messengerAnswerToMessageRow.Wait();
             serverTask.Wait();
-            messengerTask.Wait();
+            messengerAnswerToEndpointsRow.Wait();
             Console.WriteLine("Сервер остановлен!");
         }
 
