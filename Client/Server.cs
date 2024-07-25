@@ -5,13 +5,13 @@ using System.Net.Sockets;
 using System.Text;
 namespace Client
 {
-    public delegate void IncomingMess(bool isRecieved, BaseMessage message);
     public delegate void IncomingMessage(BaseMessage message);
 
     public class Server : IDisposable
     {
-        public event IncomingMess? IncomingMessageCheck;
         public event IncomingMessage? IncomingMessage;
+        public event EventHandler? RecipientIsOflline;
+        public event EventHandler? RecipientDoesntExist;
         private readonly UdpClient udpClient;
         private bool disposedValue;
         private CancellationTokenSource cancellationToken;
@@ -38,7 +38,7 @@ namespace Client
             udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
             this.messenger = messenger;
         }
-        public async Task WaitForAMessage()
+        public async Task WaitForAMessageAsync()
         {
             while (true)
             {
@@ -50,7 +50,6 @@ namespace Client
 
                     if(cToken.IsCancellationRequested)
                     {
-                        messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod());
                         break;
                     }
                     if (completedTask == receiveTask)

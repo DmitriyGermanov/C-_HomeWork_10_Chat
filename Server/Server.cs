@@ -46,7 +46,7 @@ namespace Server
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
                             ServerClient client = clientList.GetClientByNameFromDb(message.NicknameFrom);
-                            if (client!=null && client.IsOnline && !message.DisconnectRequest)
+                            if (client != null && client.IsOnline && !message.DisconnectRequest)
                                 clientList.SetClientAskTimeInDb(client, message);
                             if (client == null && message.LocalEndPoint != null)
                             {

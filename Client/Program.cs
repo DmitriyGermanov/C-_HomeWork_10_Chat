@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Client.Messages;
+﻿using Client.Messages;
 using Client.Messages.Fabric;
 
 namespace Client
@@ -13,10 +12,8 @@ namespace Client
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            int counter = 0;
             Messenger messenger = new Messenger();
             Server server = new Server(cancellationTokenSource, messenger);
-
             server.IncomingMessage += (BaseMessage message) =>
             {
                 Messages.Push(message);
@@ -44,7 +41,7 @@ namespace Client
                     }
                 }
             });
-            Task waitingForMessage = Task.Run(server.WaitForAMessage);
+            Task waitingForMessage = Task.Run(server.WaitForAMessageAsync);
             Console.WriteLine("Введите Ваш Ник: ");
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();

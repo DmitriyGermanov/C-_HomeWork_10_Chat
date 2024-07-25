@@ -16,7 +16,6 @@ namespace Client
             udpClient = new UdpClient();
         }
 
-
         public async Task SendMessageAsync(BaseMessage message)
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
