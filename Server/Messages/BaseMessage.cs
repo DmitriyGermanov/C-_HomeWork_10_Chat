@@ -64,7 +64,6 @@ namespace Server.Messages
         public override string? ToString()
         {
             StringBuilder sb = new();
-            if (DateTime != null)
                 sb.Append(DateTime + " ");
             if (NicknameFrom != null)
                 sb.Append(NicknameFrom + ": ");

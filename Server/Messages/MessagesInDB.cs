@@ -7,12 +7,10 @@ namespace Server.Messages
 {
     internal class MessagesInDB
     {
-        private Messenger messenger;
         private ClientsInDb clientsInDb;
 
-        public MessagesInDB(Messenger messenger, ClientsInDb clientsInDb)
+        public MessagesInDB(ClientsInDb clientsInDb)
         {
-            this.messenger = messenger;
             this.clientsInDb = clientsInDb;
         }
 
@@ -48,17 +46,15 @@ namespace Server.Messages
 
                         foreach (var message in messages)
                         {
-                            message.NicknameFrom = (clientsInDb.GetClientByIFromDb(message.UserIDFrom)).Name;
+                            message.NicknameFrom = (clientsInDb.GetClientByIdFromDb(message.UserIDFrom)).Name;
                             Console.WriteLine(message);
                             // Отправка каждого сообщения
                             await serverClient.SendToClientAsync(serverClient, message);
                         }
                         await serverClient.SendToClientAsync(serverClient, new MessageCreatorDefault().FactoryMethodWIthText($"У вас {messages.Count} непрочитанных сообщений:"));
 
-
                         ctx.Messages.RemoveRange(messages);
-                        ctx.SaveChangesAsync();
-                    }
+                        await ctx.SaveChangesAsync();
                 }
                 catch
                 {

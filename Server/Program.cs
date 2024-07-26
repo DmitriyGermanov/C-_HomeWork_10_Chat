@@ -13,7 +13,7 @@ namespace Server
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             clientList = new ClientsInDb();
             messenger = new Messenger(cancellationTokenSource, clientList);
-            MessagesInDB messagesInDB = new(messenger, clientList);
+            MessagesInDB messagesInDB = new(clientList);
             Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);
