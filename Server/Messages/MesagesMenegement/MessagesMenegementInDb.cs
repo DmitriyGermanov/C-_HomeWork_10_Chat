@@ -1,39 +1,36 @@
-﻿
-using MySqlX.XDevAPI;
-using Server.Clients;
+﻿using Server.Clients;
+using Server.Clients.ClientsMenegement;
 using Server.Messages.Fabric;
 
-namespace Server.Messages
+namespace Server.Messages.MesagesMenegement
 {
-    internal class MessagesInDB
+    public class MessagesMenegementInDb : IMessagesMenegement
     {
-        private ClientsInDb clientsInDb;
+        private IClientMeneger clientsInDb;
 
-        public MessagesInDB(ClientsInDb clientsInDb)
+        public MessagesMenegementInDb(IClientMeneger clientsInDbMeneger)
         {
-            this.clientsInDb = clientsInDb;
+            this.clientsInDb = clientsInDbMeneger;
         }
 
-        internal static void SaveMessageToDb(BaseMessage baseMessage)
+        public static void SaveMessageToDb(BaseMessage baseMessage)
         {
-            using (var ctx = new UdpServerContext())
+            using var ctx = new UdpServerContext();
+
+            try
             {
-
-                try
-                {
-                    ctx.Attach(baseMessage.ClientFrom);
-                    ctx.Attach(baseMessage.ClientTo);
-                    ctx.Add(baseMessage);
-                    ctx.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                }
+                ctx.Attach(baseMessage.ClientFrom);
+                ctx.Attach(baseMessage.ClientTo);
+                ctx.Add(baseMessage);
+                ctx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
-        internal async Task ShowUnrecievedMessagesAsync(ServerClient serverClient)
+       public async Task ShowUnrecievedMessagesAsync(ServerClient serverClient)
         {
             Console.WriteLine("Сработал ShowUnrecievedMessages");
             using (var ctx = new UdpServerContext())
@@ -46,15 +43,15 @@ namespace Server.Messages
 
                         foreach (var message in messages)
                         {
-                            message.NicknameFrom = (clientsInDb.GetClientByIdFromDb(message.UserIDFrom)).Name;
+                            message.NicknameFrom = clientsInDb.GetClientByID(message.UserIDFrom).Name;
                             Console.WriteLine(message);
-                            // Отправка каждого сообщения
                             await serverClient.SendToClientAsync(serverClient, message);
                         }
                         await serverClient.SendToClientAsync(serverClient, new MessageCreatorDefault().FactoryMethodWIthText($"У вас {messages.Count} непрочитанных сообщений:"));
 
                         ctx.Messages.RemoveRange(messages);
                         await ctx.SaveChangesAsync();
+                    }
                 }
                 catch
                 {

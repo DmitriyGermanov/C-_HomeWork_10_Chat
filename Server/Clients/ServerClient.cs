@@ -1,4 +1,5 @@
-﻿using Server.Messages;
+﻿using Server.Clients.ClientsMenegement;
+using Server.Messages;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -11,7 +12,7 @@ delete: он удаляет клиента из списка
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Server.Clients
 {
-    internal class ServerClient : ClientBase
+    public class ServerClient : ClientBase
     {
 
 
@@ -79,7 +80,7 @@ namespace Server.Clients
             });
         }
 
-        public override void Send(BaseMessage message, Mediator mediator)
+        public override void Send(BaseMessage message, IClientMeneger mediator)
         {
             mediator.Send(message, this);
         }

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Server.Messages
 {
-    internal abstract class BaseMessage
+    public abstract class BaseMessage
     {
         public int MessageID { get; set; }
         public string? Text { get; set; }

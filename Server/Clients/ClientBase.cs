@@ -1,12 +1,13 @@
-﻿using Server.Messages;
+﻿using Server.Clients.ClientsMenegement;
+using Server.Messages;
 using System.Net;
 
 namespace Server.Clients
 {
-    abstract class ClientBase
+    public abstract class ClientBase
     {
-        protected Mediator mediator;
-        public virtual Mediator Mediator { get { return mediator; } set { } }
+        protected IClientMeneger mediator;
+        public virtual IClientMeneger Mediator { get { return mediator; } set { } }
     
 /*        public ClientBase(Mediator mediator)
         {
@@ -17,7 +18,7 @@ namespace Server.Clients
         {
         }
 
-        public abstract void Send (BaseMessage message, Mediator mediator);
+        public abstract void Send (BaseMessage message, IClientMeneger mediator);
         public abstract void Receive (BaseMessage message); 
     }
 }

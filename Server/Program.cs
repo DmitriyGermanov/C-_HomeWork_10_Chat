@@ -1,4 +1,4 @@
-﻿using Server.Clients;
+﻿using Server.Clients.ClientsMenegement;
 using Server.Messages;
 
 namespace Server
@@ -7,14 +7,13 @@ namespace Server
     {
         private static CancellationTokenSource cancellationTokenSource = new();
         private static Messenger? messenger;
-        private static ClientsInDb? clientList;
+        private static IClientMeneger? clientInDbMeneger;
         static void Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            clientList = new ClientsInDb();
-            messenger = new Messenger(cancellationTokenSource, clientList);
-            MessagesInDB messagesInDB = new(clientList);
-            Server server = new Server(cancellationTokenSource, clientList, messagesInDB);
+            clientInDbMeneger = new ClientsInDb();
+            messenger = new Messenger(cancellationTokenSource, clientInDbMeneger);
+            UdpServer server = new UdpServer(cancellationTokenSource, clientInDbMeneger);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);
             Task messengerAnswerToEndpointsRow = Task.Run(() => messenger.SendAnswerFromEndpointRow());

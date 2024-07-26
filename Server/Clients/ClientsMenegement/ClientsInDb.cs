@@ -1,10 +1,10 @@
 ﻿using Server.Messages;
 //to-do: наследоваться от медиатора, переделпать связи в остальном части кода
-namespace Server.Clients
+namespace Server.Clients.ClientsMenegement
 {
-    internal class ClientsInDb : ClientList
+    public class ClientsInDb : IClientMeneger
     {
-        public void ClientRegistrationInDb(BaseMessage message)
+        public void ClientRegistration(BaseMessage message)
         {
             Console.WriteLine("сработал ClientReg");
             using var ctx = new UdpServerContext();
@@ -31,18 +31,18 @@ namespace Server.Clients
             }
         }
 
-        public ServerClient GetClientByNameFromDb(string name)
+        public ServerClient GetClientByName(string name)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
         }
-        public ServerClient GetClientByIdFromDb(int? clientId)
+        public ServerClient GetClientByID(int? clientId)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.ClientID == clientId);
         }
 
-        public void SetClientAskTimeInDb(ServerClient client, BaseMessage message)
+        public void SetClientAskTime(ServerClient client, BaseMessage message)
         {
             Console.WriteLine("сработал SetClientAskTimeInDb");
             using var ctx = new UdpServerContext();
@@ -60,7 +60,7 @@ namespace Server.Clients
             }
         }
 
-        internal void SetClientOfflineInDb(ServerClient client)
+        public void SetClientOffline(ServerClient client)
         {
             Console.WriteLine("сработал SetClientOfflineInDb");
             using var ctx = new UdpServerContext();
@@ -75,7 +75,7 @@ namespace Server.Clients
                 throw new Exception("Ошибка! Клиент не найден методом SetClientOfflineInDb, проверьте логику работы");
             }
         }
-        public override void Send(BaseMessage message, ServerClient client)
+        public  void Send(BaseMessage message, ServerClient client)
         {
             Console.WriteLine("сработал SendToAll");
             using var ctx = new UdpServerContext();

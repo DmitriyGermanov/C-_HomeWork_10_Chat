@@ -1,34 +1,35 @@
 ﻿using Server.Clients;
+using Server.Clients.ClientsMenegement;
 using Server.Messages;
+using Server.Messages.MesagesMenegement;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
 namespace Server
 {
-    internal delegate void ServerDelegate(BaseMessage message);
-    public class Server
+    public delegate void ServerDelegate(BaseMessage message);
+    public class UdpServer
     {
-        internal event ServerDelegate? IncomingMessage;
+        public event ServerDelegate? IncomingMessage;
 
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
-        private ClientsInDb clientList;
-        private MessagesInDB messagesInDb;
+        private IClientMeneger clientList;
+        private IMessagesMenegement _messageMenegerInDb;
 
-        public Server()
+        public UdpServer()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        internal Server(CancellationTokenSource cancellationToken, ClientsInDb clientList, MessagesInDB messagesInDb)
+        public UdpServer(CancellationTokenSource cancellationToken, IClientMeneger clientList)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
             this.clientList = clientList;
-            this.messagesInDb = messagesInDb;
+            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
         }
-
 
         public async Task StartAsync()
         {
@@ -45,27 +46,27 @@ namespace Server
                         {
                             UdpReceiveResult result = receiveTask.Result;
                             BaseMessage? message = messageGetter(receiveTask);
-                            ServerClient client = clientList.GetClientByNameFromDb(message.NicknameFrom);
+                            ServerClient client = clientList.GetClientByName(message.NicknameFrom);
                             if (client != null && client.IsOnline && !message.DisconnectRequest)
-                                clientList.SetClientAskTimeInDb(client, message);
+                                clientList.SetClientAskTime(client, message);
                             if (client == null && message.LocalEndPoint != null)
                             {
-                                clientList.ClientRegistrationInDb(message);
+                                clientList.ClientRegistration(message);
                                 IncomingMessage?.Invoke(message);
                             }
                             else if (client != null && !client.IsOnline && !message.Ask)
                             {
-                                clientList.SetClientAskTimeInDb(client, message);
-                                messagesInDb.ShowUnrecievedMessagesAsync(client);
+                                clientList.SetClientAskTime(client, message);
+                                _messageMenegerInDb.ShowUnrecievedMessagesAsync(client);
                                 IncomingMessage?.Invoke(message);
                             }
-                            else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
-                            {
-                                clientList.SetClientAskTimeInDb(client, message);
-                            }
+                            /*                    else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
+                                                {
+                                                    clientList.SetClientAskTimeInDb(client, message);
+                                                }*/
                             else if (client != null && message.Ask && !message.UserDoesNotExist && message.DisconnectRequest)
                             {
-                                clientList.SetClientOfflineInDb(client);
+                                clientList.SetClientOffline(client);
                             }
                             else
                             {
