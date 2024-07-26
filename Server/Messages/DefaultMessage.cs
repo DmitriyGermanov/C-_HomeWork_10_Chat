@@ -7,6 +7,7 @@
             DisconnectRequest = false;
             UserDoesNotExist = false;
             UserIsOnline = true;
+            DateTime = DateTime.Now;
         }
 
         public DefaultMessage(string text)

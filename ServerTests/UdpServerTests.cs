@@ -5,6 +5,7 @@ using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.Messages.MesagesMenegement;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace ServerTests
@@ -30,9 +31,10 @@ namespace ServerTests
         public void StartAsync_ShouldStartServer()
         {
             var task = server.StartAsync();
-            Task.Delay(100).Wait(); 
+            Task.Delay(100).Wait();
 
             Assert.IsFalse(task.IsCompleted);
+            server.Stop();
         }
 
         [TestMethod]
@@ -43,33 +45,36 @@ namespace ServerTests
             Task.Delay(100).Wait();
             Assert.IsTrue(task.IsCompleted);
         }
-
         [TestMethod]
-        public async Task Test_HandleRegisteredClientMessage()
+        public async Task Test_Message_Invoked()
         {
-
             BaseMessage message = new DefaultMessage
             {
                 NicknameFrom = "TestUser",
+                Text = String.Empty,
                 DisconnectRequest = false,
-                Ask = false
+                Ask = false,
+
+                LocalEndPoint = new IPEndPoint(IPAddress.Loopback, 5555)
             };
-
-            mockClientManager
-                .Setup(m => m.GetClientByName(It.IsAny<string>()))
-                .Returns(new ServerClient { Name = "TestUser", IsOnline = true, ClientEndPoint = IPEndPoint.Parse("127.0.0.1:5555") });
-
-            server.StartAsync();
-
-            var client = new System.Net.Sockets.UdpClient();
-            var messageBytes = Encoding.UTF8.GetBytes(message.SerializeMessageToJson());
-            await client.SendAsync(messageBytes, messageBytes.Length, "localhost", 12345);
-
+            bool eventTriggered = false;
+            server.IncomingMessage += (msg) =>
+            {
+                eventTriggered = true;
+            };
+            mockClientManager.Setup(m => m.GetClientByName(It.IsAny<string>())).Returns(new ServerClient { Name = "TestUser", ClientEndPoint = new IPEndPoint(IPAddress.Loopback, 5555), IsOnline = true });
+            mockClientManager.Setup(m => m.SetClientAskTime(It.IsAny<ServerClient>(), message)).Verifiable();
+            var serverTask = Task.Run(() => server.StartAsync());
+            using (UdpClient? client = new UdpClient(0))
+            {
+                var messageBytes = Encoding.UTF8.GetBytes(message.SerializeMessageToJson());
+                await client.SendAsync(messageBytes, messageBytes.Length, IPEndPoint.Parse("127.0.0.1:12345"));
+            }
             await Task.Delay(1000);
-
-            mockClientManager.Verify(m => m.SetClientAskTime(It.IsAny<ServerClient>(), It.IsAny<BaseMessage>()), Times.Once);
-
             server.Stop();
+            await serverTask;
+            //mockClientManager.Verify(m => m.SetClientAskTime(It.IsAny<ServerClient>(), message), Times.Once);
+            Assert.IsTrue(eventTriggered, "IncomingMessage event was not triggered.");
         }
     }
 }

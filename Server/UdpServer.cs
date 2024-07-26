@@ -2,7 +2,6 @@
 using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.Messages.MesagesMenegement;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -33,7 +32,6 @@ namespace Server
 
         public async Task StartAsync()
         {
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
             using (System.Net.Sockets.UdpClient udpClient = new System.Net.Sockets.UdpClient(12345))
             {
                 while (!cToken.IsCancellationRequested)
