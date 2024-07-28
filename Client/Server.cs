@@ -43,26 +43,25 @@ namespace Client
             {
                 try
                 {
-                    var receiveTask = udpClient.ReceiveAsync();
-                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
-
-                    if(cToken.IsCancellationRequested)
+                    if (cToken.IsCancellationRequested)
                     {
                         break;
                     }
+                    var receiveTask = messenger.RecieveMessageAsync(udpClient, cancellationToken.Token);
+                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
                     if (completedTask == receiveTask)
                     {
-                        UdpReceiveResult result = receiveTask.Result;
-                        BaseMessage? message = messageGetter(receiveTask);
+                        BaseMessage? message = receiveTask.Result;
                         if (!message.Ask)
                         {
-                           IncomingMessage?.Invoke(message);
-                        } else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
+                            IncomingMessage?.Invoke(message);
+                        }
+                        else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
                         {
                             IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Получатель не в сети, сообщение будет доставлено позже!"));
                         }
-           
-                        else if(message.Ask && message.UserDoesNotExist)
+
+                        else if (message.Ask && message.UserDoesNotExist)
                         {
                             IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Такой получатель отсутствует!"));
                         }
@@ -88,13 +87,7 @@ namespace Client
                 }
             }
         }
-        public static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
-        {
-            var result = receiveTask.Result;
-            var messageString = Encoding.UTF8.GetString(result.Buffer);
-            var message = BaseMessage.DeserializeFromJson(messageString);
-            return message;
-        }
+   
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using Client.Messages;
 
 namespace Client.ClientMessenger
@@ -42,6 +43,13 @@ namespace Client.ClientMessenger
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public async Task<BaseMessage> RecieveMessageAsync(UdpClient udpClient, CancellationToken ctoken)
+        {
+            var result = await udpClient.ReceiveAsync(ctoken);
+            var messageString = Encoding.UTF8.GetString(result.Buffer);
+            return BaseMessage.DeserializeFromJson(messageString);
         }
     }
 
