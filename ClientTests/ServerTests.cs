@@ -33,8 +33,7 @@ namespace ClientTests
             bool messageReceived = false;
             server.IncomingMessage += (msg) => messageReceived = true;
             Console.WriteLine("2");
-            var serverTask = server.WaitForAMessageAsync();
-
+            var serverTask = Task.Run(() => server.WaitForAMessageAsync());
             await Task.Delay(1000);
             cts.Cancel();
             await serverTask;

@@ -39,14 +39,10 @@ namespace Client
         }
         public async Task WaitForAMessageAsync()
         {
-            while (true)
+            while (!cToken.IsCancellationRequested)
             {
                 try
                 {
-                    if (cToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
                     var receiveTask = messenger.RecieveMessageAsync(udpClient, cancellationToken.Token);
                     var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
                     if (completedTask == receiveTask)
@@ -87,7 +83,7 @@ namespace Client
                 }
             }
         }
-   
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
