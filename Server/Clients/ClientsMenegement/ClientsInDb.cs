@@ -1,5 +1,4 @@
 ﻿using Server.Messages;
-//to-do: наследоваться от медиатора, переделпать связи в остальном части кода
 namespace Server.Clients.ClientsMenegement
 {
     public class ClientsInDb : IClientMeneger

@@ -78,13 +78,15 @@ namespace Server
                         Console.WriteLine("Операция отменена.");
                         break;
                     }
-                    catch (SocketException se)
+                    catch (SocketException)
                     {
                         Console.WriteLine("Не удалось подтвердить получение сообщения! Проверьте доступность клиента!");
+                        throw;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex);
+                        throw;
                     }
                 }
             }
