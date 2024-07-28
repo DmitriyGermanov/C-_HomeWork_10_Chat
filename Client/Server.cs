@@ -3,6 +3,7 @@ using Client.Messages;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Client.ClientMessenger;
 namespace Client
 {
     public delegate void IncomingMessage(BaseMessage message);
@@ -10,13 +11,11 @@ namespace Client
     public class Server : IDisposable
     {
         public event IncomingMessage? IncomingMessage;
-        public event EventHandler? RecipientIsOflline;
-        public event EventHandler? RecipientDoesntExist;
         private readonly UdpClient udpClient;
         private bool disposedValue;
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
-        private Messenger messenger;
+        private IMessageSourceClient messenger;
         public IPEndPoint LocalEndPoint
         {
             get
@@ -31,7 +30,7 @@ namespace Client
             cToken = cancellationToken.Token;
             udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
         }
-        public Server(CancellationTokenSource cancellationToken, Messenger messenger)
+        public Server(CancellationTokenSource cancellationToken, IMessageSourceClient messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
@@ -44,7 +43,6 @@ namespace Client
             {
                 try
                 {
-                    //ToDO: Если ask - true, тогда invoke не делаем и сразу отправляем ответ серверу с ask=true 
                     var receiveTask = udpClient.ReceiveAsync();
                     var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
 
@@ -58,16 +56,15 @@ namespace Client
                         BaseMessage? message = messageGetter(receiveTask);
                         if (!message.Ask)
                         {
-                            //TODO: убрать проверку условий, вынести все проверки и печат в main
                            IncomingMessage?.Invoke(message);
                         } else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
                         {
-                            Console.WriteLine("Получатель не в сети!");
+                            IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Получатель не в сети, сообщение будет доставлено позже!"));
                         }
            
                         else if(message.Ask && message.UserDoesNotExist)
                         {
-                            Console.WriteLine("Такой получатель не зарегестрирован");
+                            IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Такой получатель отсутствует!"));
                         }
                         else
                         {
@@ -91,7 +88,7 @@ namespace Client
                 }
             }
         }
-        private static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
+        public static BaseMessage? messageGetter(Task<UdpReceiveResult> receiveTask)
         {
             var result = receiveTask.Result;
             var messageString = Encoding.UTF8.GetString(result.Buffer);
@@ -104,6 +101,7 @@ namespace Client
             {
                 if (disposing)
                 {
+                    cancellationToken.Cancel();
                     udpClient.Close();
                     udpClient.Dispose();
                 }

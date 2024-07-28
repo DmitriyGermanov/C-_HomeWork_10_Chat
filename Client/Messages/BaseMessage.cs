@@ -11,7 +11,7 @@ namespace Client.Messages
         public DateTime DateTime { get; set; }
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
-        public bool Ask { get; set; }
+        public virtual bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }
         public bool UserDoesNotExist { get; set; }

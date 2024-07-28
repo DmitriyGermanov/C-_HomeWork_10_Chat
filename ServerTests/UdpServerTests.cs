@@ -73,7 +73,6 @@ namespace ServerTests
             await Task.Delay(1000);
             server.Stop();
             await serverTask;
-            //mockClientManager.Verify(m => m.SetClientAskTime(It.IsAny<ServerClient>(), message), Times.Once);
             Assert.IsTrue(eventTriggered, "IncomingMessage event was not triggered.");
         }
     }

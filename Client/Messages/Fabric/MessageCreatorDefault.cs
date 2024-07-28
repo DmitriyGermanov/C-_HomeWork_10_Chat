@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Client.Messages.Fabric
 {
-    internal class MessageCreatorDefault : BaseMessageFabric
+    public class MessageCreatorDefault : BaseMessageFabric
     {
         public override BaseMessage FactoryMethod() => new DefaultMessage();
         public override BaseMessage FactoryMethod(IPEndPoint iPEndPoint) => new DefaultMessage(iPEndPoint);
+        public BaseMessage FactoryMethodWIthText(string text) => new DefaultMessage(text);
     }
 }

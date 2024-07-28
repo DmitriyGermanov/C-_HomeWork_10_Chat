@@ -1,5 +1,6 @@
 ﻿using Client.Messages;
 using Client.Messages.Fabric;
+using Client.ClientMessenger;
 
 namespace Client
 {
@@ -12,7 +13,7 @@ namespace Client
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            Messenger messenger = new Messenger();
+            IMessageSourceClient messenger = new Messenger();
             Server server = new Server(cancellationTokenSource, messenger);
             server.IncomingMessage += (BaseMessage message) =>
             {
@@ -57,6 +58,9 @@ namespace Client
                     waitingForMessage.Wait();
                     printerTask.Wait();
                     Console.WriteLine("Спасибо за использование, возвращайтесь!");
+                    message.DisconnectRequest = true;
+                    message.Ask = true;
+                    await messenger.SendMessageAsync(message);
                     break;
                 }
                 Console.Write("Введите для кого сообщение (пустое поле - отпр. всем): ");
@@ -64,7 +68,7 @@ namespace Client
                 message.DateTime = DateTime.Now;
                 await messenger.SendMessageAsync(message);
             } while (true);
-            await messenger.SendMessageAsync(new MessageCreatorDisconnect().FactoryMethod(server.LocalEndPoint));
+            
         }
     }
 }
