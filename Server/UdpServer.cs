@@ -37,59 +37,28 @@ namespace Server
 
         public async Task StartAsync()
         {
-            while (!cToken.IsCancellationRequested)
+            try
             {
-                try
+                while (!cToken.IsCancellationRequested)
                 {
                     var receiveTask = _messenger.RecieveMessageAsync(cToken);
-                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
-                    if (completedTask == receiveTask)
-                    {
-                        BaseMessage? message = await receiveTask;
-                        ServerClient client = clientList.GetClientByName(message.NicknameFrom);
-                        if (client != null && client.IsOnline && !message.DisconnectRequest)
-                            clientList.SetClientAskTime(client, message);
-                        if (client == null && message.LocalEndPoint != null)
-                        {
-                            clientList.ClientRegistration(message);
-                            IncomingMessage?.Invoke(message);
-                        }
-                        else if (client != null && !client.IsOnline && !message.Ask)
-                        {
-                            clientList.SetClientAskTime(client, message);
-                            _messageMenegerInDb.ShowUnrecievedMessagesAsync(client);
-                            IncomingMessage?.Invoke(message);
-                        }
-                        /*                    else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
-                                            {
-                                                clientList.SetClientAskTimeInDb(client, message);
-                                            }*/
-                        else if (client != null && message.Ask && !message.UserDoesNotExist && message.DisconnectRequest)
-                        {
-                            clientList.SetClientOffline(client);
-                        }
-                        else
-                        {
-                            IncomingMessage?.Invoke(message);
-                        }
-
-                    }
+                    var message = await receiveTask;
+                    ProcessMessage(message);
                 }
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine("Операция отменена.");
-                    break;
-                }
-                catch (SocketException)
-                {
-                    Console.WriteLine("Не удалось подтвердить получение сообщения! Проверьте доступность клиента!");
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    throw;
-                }
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Операция отменена.");
+            }
+            catch (SocketException)
+            {
+                Console.WriteLine("Не удалось подтвердить получение сообщения! Проверьте доступность клиента!");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
             }
         }
 
@@ -98,6 +67,36 @@ namespace Server
         {
             cancellationToken.Cancel();
             _messenger.Dispose();
+        }
+        private async Task ProcessMessage(BaseMessage message)
+        {
+            ServerClient client = clientList.GetClientByName(message.NicknameFrom);
+
+            if (client != null && client.IsOnline && !message.DisconnectRequest)
+                clientList.SetClientAskTime(client, message);
+            if (client == null && message.LocalEndPoint != null)
+            {
+                clientList.ClientRegistration(message);
+                IncomingMessage?.Invoke(message);
+            }
+            else if (client != null && !client.IsOnline && !message.Ask)
+            {
+                clientList.SetClientAskTime(client, message);
+                _messageMenegerInDb.ShowUnrecievedMessagesAsync(client);
+                IncomingMessage?.Invoke(message);
+            }
+            /*                    else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)
+                                {
+                                    clientList.SetClientAskTimeInDb(client, message);
+                                }*/
+            else if (client != null && message.Ask && !message.UserDoesNotExist && message.DisconnectRequest)
+            {
+                clientList.SetClientOffline(client);
+            }
+            else
+            {
+                IncomingMessage?.Invoke(message);
+            }
         }
     }
 }
