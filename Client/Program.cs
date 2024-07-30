@@ -14,7 +14,7 @@ namespace Client
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            IMessageSourceClient<IPEndPoint> messenger = new Messenger();
+            IMessageSourceClient<IPEndPoint> messenger = new UdpMessenger();
             Server server = new Server(cancellationTokenSource, messenger);
             server.IncomingMessage += (BaseMessage message) =>
             {

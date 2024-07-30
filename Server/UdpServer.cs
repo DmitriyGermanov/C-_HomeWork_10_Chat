@@ -1,10 +1,10 @@
-﻿using Server.Messages;
+﻿using Server.Clients;
 using Server.Clients.ClientsMenegement;
-using Server.Clients;
+using Server.Messages;
 using Server.Messages.MesagesMenegement;
 using Server.ServerMessenger;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Server
 {
@@ -22,6 +22,9 @@ namespace Server
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
+            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
+            this._messenger = new UdpMessenger(new UdpClient(new IPEndPoint(IPAddress.Loopback, 12345)));
+            this.clientList = new ClientsInDb();
         }
         public UdpServer(CancellationTokenSource cancellationToken, IClientMeneger clientList)
         {
@@ -29,7 +32,7 @@ namespace Server
             cToken = cancellationToken.Token;
             this.clientList = clientList;
             this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
-            this._messenger = new Messenger(new UdpClient(new IPEndPoint(IPAddress.Loopback, 12345)));
+            this._messenger = new UdpMessenger(new UdpClient(new IPEndPoint(IPAddress.Loopback, 12345)));
         }
 
         public async Task StartAsync()

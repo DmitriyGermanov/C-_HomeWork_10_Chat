@@ -14,7 +14,7 @@ namespace Server.Messages
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
         public int? UserIDFrom { get; set; }
-        public int? UserIdTo {  get; set; }
+        public int? UserIdTo { get; set; }
         [JsonIgnore]
         public virtual ServerClient ClientTo { get; set; }
         [JsonIgnore]
@@ -22,7 +22,7 @@ namespace Server.Messages
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }
-        public bool UserDoesNotExist { get; set; }  
+        public bool UserDoesNotExist { get; set; }
 
 
 
@@ -64,7 +64,7 @@ namespace Server.Messages
         public override string? ToString()
         {
             StringBuilder sb = new();
-                sb.Append(DateTime + " ");
+            sb.Append(DateTime + " ");
             if (NicknameFrom != null)
                 sb.Append(NicknameFrom + ": ");
             if (Text != null)
@@ -75,26 +75,5 @@ namespace Server.Messages
         }
 
     }
-    namespace Client.Messages
-    {
-        internal class AskMessage : BaseMessage
-        {
-            public AskMessage()
-            {
-                Ask = true;
-            }
-        }
 
-        internal class DisconnectRequestMessage : BaseMessage
-        {
-            public DisconnectRequestMessage()
-            {
-                DisconnectRequest = true;
-            }
-        }
-
-        internal class EmptyMessage : BaseMessage
-        {
-        }
-    }
 }

@@ -77,7 +77,7 @@ namespace Server.Clients
         {
             Task.Run(() =>
             {
-                Messenger.SendMessageAsync(message, ClientEndPoint);
+                UdpMessenger.SendMessageAsync(message, ClientEndPoint);
             });
         }
 
@@ -91,7 +91,7 @@ namespace Server.Clients
             return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
         }
         //To-do: убрать, оставить только в messenger
-        internal async Task SendToClientAsync(ServerClient? client, BaseMessage message) => await Messenger.SendMessageAsync(message, client.clientEndPoint);
+        internal async Task SendToClientAsync(ServerClient? client, BaseMessage message) => await UdpMessenger.SendMessageAsync(message, client.clientEndPoint);
 
     }
 }

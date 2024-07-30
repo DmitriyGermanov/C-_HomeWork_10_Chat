@@ -1,32 +1,28 @@
-﻿using Server.Messages;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Client.Messages;
 
-namespace Server.ServerMessenger
+namespace Client.ClientMessenger
 {
-
-    public class Messenger : IDisposable, IMessageSourceServer<IPEndPoint>
+    public class UdpMessenger : IDisposable, IMessageSourceClient<IPEndPoint>
     {
         private IPEndPoint? _localEndPoint;
         private UdpClient _udpClient;
         private bool _disposedValue;
         public UdpClient UdpClient { get => _udpClient; set => _udpClient = value; }
 
-        public Messenger()
+        public UdpMessenger()
         {
             _udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
         }
-        public Messenger(UdpClient udpClient)
+
+        public async Task SendMessageAsync(BaseMessage message)
         {
-            _udpClient = udpClient;
-        }
-        public async static Task SendMessageAsync(BaseMessage message, IPEndPoint endPoint)
-        {
-            using UdpClient udpClient = new UdpClient(0);
+            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
             string jSonToSend = message.SerializeMessageToJson();
             byte[] data = System.Text.Encoding.UTF8.GetBytes(jSonToSend);
-            await udpClient.SendAsync(data, data.Length, endPoint);
+            await _udpClient.SendAsync(data, data.Length, remoteEndPoint);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -58,4 +54,5 @@ namespace Server.ServerMessenger
 
         public IPEndPoint GetServerEndPoint() => _udpClient.Client.LocalEndPoint as IPEndPoint;
     }
+
 }

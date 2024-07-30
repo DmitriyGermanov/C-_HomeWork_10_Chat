@@ -22,7 +22,7 @@ namespace Server
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
-            _messenger = new Messenger();
+            _messenger = new UdpMessenger();
         }
         internal MessageCollector(CancellationTokenSource cancellationToken, IClientMeneger clientList)
         {
@@ -30,7 +30,7 @@ namespace Server
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
             this.clientList = clientList;
-            _messenger = new Messenger();
+            _messenger = new UdpMessenger();
         }
         internal MessageCollector(CancellationTokenSource cancellationToken, BaseMessage message)
         {
@@ -38,7 +38,7 @@ namespace Server
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
             this.message = message;
-            _messenger = new Messenger();
+            _messenger = new UdpMessenger();
         }
         public void EndpointCollector(IPEndPoint endPoint) => endPoints.Push(endPoint);
         internal void MessagesCollector(BaseMessage message) => messages.Push(message);
@@ -90,7 +90,7 @@ namespace Server
             {
                 if (endPoints.Count > 0)
                 {
-                    await Messenger.SendMessageAsync(message, endPoints.Pop());
+                    await UdpMessenger.SendMessageAsync(message, endPoints.Pop());
                 }
 
                 else
