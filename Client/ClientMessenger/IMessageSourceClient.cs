@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace Client.ClientMessenger
 {
-    public interface IMessageSourceClient
+    public interface IMessageSourceClient : IDisposable
     {
         public Task SendMessageAsync(BaseMessage message);
         public Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken);

@@ -3,41 +3,42 @@ using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.Messages.Fabric;
 using Server.Messages.MesagesMenegement;
+using Server.ServerMessenger;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
-//TO DO: связать через интерфейс IMessageSource
 namespace Server
 {
-    public class Messenger
+    public class MessageCollector
     {
         private CancellationTokenSource? cancellationToken;
         private CancellationToken cToken;
         private Stack<IPEndPoint> endPoints;
         public virtual Stack<IPEndPoint> EndPoints => endPoints;
         private BaseMessage? message;
-        public virtual int MessengerID { get; set; }
         private static Stack<BaseMessage>? messages = new();
         private IClientMeneger? clientList;
-        public Messenger()
+        private IMessageSourceServer _messenger;
+        public MessageCollector()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
+            _messenger = new Messenger();
         }
-        internal Messenger(CancellationTokenSource cancellationToken, IClientMeneger clientList)
+        internal MessageCollector(CancellationTokenSource cancellationToken, IClientMeneger clientList)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
             this.clientList = clientList;
+            _messenger = new Messenger();
         }
-        internal Messenger(CancellationTokenSource cancellationToken, BaseMessage message)
+        internal MessageCollector(CancellationTokenSource cancellationToken, BaseMessage message)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
             endPoints = new Stack<IPEndPoint>();
             this.message = message;
+            _messenger = new Messenger();
         }
         public void EndpointCollector(IPEndPoint endPoint) => endPoints.Push(endPoint);
         internal void MessagesCollector(BaseMessage message) => messages.Push(message);
@@ -85,36 +86,20 @@ namespace Server
         public async Task SendAnswerFromEndpointRow()
         {
             BaseMessage? message = new MessageCreatorDefault().FactoryMethodWIthText("Сообщение было получено сервером");
-            using (UdpClient? udpClient = new UdpClient())
+            while (!cToken.IsCancellationRequested)
             {
+                if (endPoints.Count > 0)
                 {
-                    while (!cToken.IsCancellationRequested)
-                    {
-                        if (endPoints.Count > 0)
-                        {
-                            string jSonToSend = message.SerializeMessageToJson();
-                            byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
-                            await udpClient.SendAsync(responseData, responseData.Length, endPoints.Pop());
-                        }
-
-                        else
-                        {
-                            Thread.Sleep(100);
-                        }
-                    }
+                    await Messenger.SendMessageAsync(message, endPoints.Pop());
                 }
-            }
-        }
-        internal async static Task AnswerSenderAsync(BaseMessage message, IPEndPoint clientEndpoint)
-        {
-            using (UdpClient? udpClient = new UdpClient())
-            {
-                //Console.WriteLine("Отправляю сообщение для" + clientEndpoint);
-                string jSonToSend = message.SerializeMessageToJson();
-                byte[] responseData = Encoding.UTF8.GetBytes(jSonToSend);
-               await udpClient.SendAsync(responseData, responseData.Length, clientEndpoint);
+
+                else
+                {
+                    Thread.Sleep(100);
+                }
             }
         }
     }
 }
+
 

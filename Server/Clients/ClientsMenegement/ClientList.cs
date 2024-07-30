@@ -9,13 +9,11 @@ namespace Server.clients.clientsMenegement
     {
         //TODO: Для базы нужен будет синглтон
         //TODO: Переделываем на Dictionary<Client, Stack<Message> Логика: для каждого Client в Dictionary копим Stack Message, если клиент IsOnline держим Stack.Count = 0, если клиент IsOffline копим Stack (при смене статуса отдельным методом опустошаем Stack). Если статус Client IsOffline, то Server не делает Invoke и передает управление накопительному методу, если статус Client IsOnline, то делается Invoke => message поступает в Program, Client отправитель записывается в ClientFrom. Метод проверяет есть ли в Stack этого клиента message и освобождает Stack отправляя messages клиенту.
-        public Messenger Messenger;
         private List<ServerClient> clients;
 
         public ClientList()
         {
             this.clients = new();
-            Messenger = new Messenger();
         }
 
         public virtual void ClientRegistration(BaseMessage message)

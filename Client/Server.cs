@@ -19,7 +19,6 @@ namespace Client
             get
             {
                 return messenger.GetServerEndPoint();
-                
             }
         }
         public Server()
