@@ -21,7 +21,7 @@ namespace Server.ServerMessenger
         {
             _udpClient = udpClient;
         }
-        public async static Task SendMessageAsync(BaseMessage message, IPEndPoint endPoint)
+        public async Task SendMessageAsync(BaseMessage message, IPEndPoint endPoint)
         {
             using UdpClient udpClient = new UdpClient(0);
             string jSonToSend = message.SerializeMessageToJson();
