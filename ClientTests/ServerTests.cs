@@ -11,14 +11,6 @@ namespace ClientTests
     public class ServerTests
     {
         [Fact]
-        public void Server_Constructor_SetsLocalEndPoint()
-        {
-            var udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-            var server = new Client.Server(udpClient);
-            var localEndPoint = server.LocalEndPoint;
-            Assert.Equal(IPAddress.Loopback, localEndPoint.Address);
-        }
-        [Fact]
         public async Task Server_InvokesIncomingMessage_WhenMessageReceived()
         {
             var mockMessenger = new Mock<IMessageSourceClient>();
@@ -27,7 +19,7 @@ namespace ClientTests
             var server = new Server(cts, mockMessenger.Object);
 
             var testMessage = new DefaultMessage { NicknameFrom = "TestUser", Text = "Test Message", Ask = false };
-            mockMessenger.Setup(m => m.RecieveMessageAsync(It.IsAny<UdpClient>(), cts.Token))
+            mockMessenger.Setup(m => m.RecieveMessageAsync(cts.Token))
                          .ReturnsAsync(testMessage);
             Console.WriteLine("1");
             bool messageReceived = false;
@@ -39,7 +31,7 @@ namespace ClientTests
             await serverTask;
 
             Assert.True(messageReceived, "The IncomingMessage event was not triggered.");
-            mockMessenger.Verify(m => m.RecieveMessageAsync(It.IsAny<UdpClient>(), cts.Token), Times.AtLeastOnce);
+            mockMessenger.Verify(m => m.RecieveMessageAsync(cts.Token), Times.AtLeastOnce);
         }
         [Fact]
         public async Task Server_ShouldStop()
@@ -56,7 +48,6 @@ namespace ClientTests
         public async Task Messenger_RecieveMessageAsync_ReturnsExpectedBaseMessage()
         {
             var mockMessenger = new Mock<IMessageSourceClient>();
-            var udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             var expectedMessage = new DefaultMessage
             {
@@ -69,9 +60,9 @@ namespace ClientTests
                 LocalEndPoint = new IPEndPoint(IPAddress.Loopback, 12345)
             };
 
-            mockMessenger.Setup(m => m.RecieveMessageAsync(udpClient, cancellationTokenSource.Token))
+            mockMessenger.Setup(m => m.RecieveMessageAsync(cancellationTokenSource.Token))
                          .ReturnsAsync(expectedMessage);
-            var actualMessage = await mockMessenger.Object.RecieveMessageAsync(udpClient, cancellationTokenSource.Token);
+            var actualMessage = await mockMessenger.Object.RecieveMessageAsync(cancellationTokenSource.Token);
             Assert.NotNull(actualMessage);
             Assert.Equal(expectedMessage.NicknameFrom, actualMessage.NicknameFrom);
             Assert.Equal(expectedMessage.Text, actualMessage.Text);

@@ -54,7 +54,6 @@ namespace ServerTests
                 Text = String.Empty,
                 DisconnectRequest = false,
                 Ask = false,
-
                 LocalEndPoint = new IPEndPoint(IPAddress.Loopback, 5555)
             };
             bool eventTriggered = false;
