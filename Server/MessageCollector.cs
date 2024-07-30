@@ -16,7 +16,7 @@ namespace Server
         private BaseMessage? message;
         private static Stack<BaseMessage>? messages = new();
         private IClientMeneger? clientList;
-        private IMessageSourceServer _messenger;
+        private IMessageSourceServer<IPEndPoint> _messenger;
         public MessageCollector()
         {
             cancellationToken = new CancellationTokenSource();

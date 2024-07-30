@@ -1,6 +1,7 @@
 ﻿using Client.Messages;
 using Client.Messages.Fabric;
 using Client.ClientMessenger;
+using System.Net;
 
 namespace Client
 {
@@ -13,7 +14,7 @@ namespace Client
         static async Task Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            IMessageSourceClient messenger = new Messenger();
+            IMessageSourceClient<IPEndPoint> messenger = new Messenger();
             Server server = new Server(cancellationTokenSource, messenger);
             server.IncomingMessage += (BaseMessage message) =>
             {

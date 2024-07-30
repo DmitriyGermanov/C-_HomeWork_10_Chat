@@ -6,7 +6,7 @@ using System.Text;
 namespace Server.ServerMessenger
 {
 
-    public class Messenger : IDisposable, IMessageSourceServer
+    public class Messenger : IDisposable, IMessageSourceServer<IPEndPoint>
     {
         private IPEndPoint? _localEndPoint;
         private UdpClient _udpClient;

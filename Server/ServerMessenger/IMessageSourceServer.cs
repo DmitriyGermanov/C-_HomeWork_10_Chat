@@ -3,11 +3,11 @@ using Server.Messages;
 
 namespace Server.ServerMessenger
 {
-    public interface IMessageSourceServer: IDisposable
+    public interface IMessageSourceServer<T>: IDisposable
     {
-        public abstract static Task SendMessageAsync(BaseMessage message, IPEndPoint endPoint);
+        public abstract static Task SendMessageAsync(BaseMessage message, T endPoint);
         public Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken);
-        public IPEndPoint GetServerEndPoint();
+        public T GetServerEndPoint();
 
     }
 }

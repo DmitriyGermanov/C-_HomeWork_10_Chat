@@ -16,7 +16,7 @@ namespace Server
         private CancellationToken cToken;
         private IClientMeneger clientList;
         private IMessagesMenegement _messageMenegerInDb;
-        private IMessageSourceServer _messenger;
+        private IMessageSourceServer<IPEndPoint> _messenger;
 
         public UdpServer()
         {

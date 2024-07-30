@@ -5,7 +5,7 @@ using Client.Messages;
 
 namespace Client.ClientMessenger
 {
-    public class Messenger : IDisposable, IMessageSourceClient
+    public class Messenger : IDisposable, IMessageSourceClient<IPEndPoint>
     {
         private IPEndPoint? _localEndPoint;
         private UdpClient _udpClient;

@@ -13,7 +13,7 @@ namespace Client
         private bool disposedValue;
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
-        private IMessageSourceClient messenger;
+        private IMessageSourceClient<IPEndPoint> messenger;
         public IPEndPoint LocalEndPoint
         {
             get
@@ -26,7 +26,7 @@ namespace Client
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        public Server(CancellationTokenSource cancellationToken, IMessageSourceClient messenger)
+        public Server(CancellationTokenSource cancellationToken, IMessageSourceClient<IPEndPoint> messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
