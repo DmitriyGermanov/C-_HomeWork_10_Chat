@@ -46,6 +46,7 @@ namespace Client
             Console.WriteLine("Введите Ваш Ник: ");
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
+            Console.WriteLine(server.LocalEndPoint);
             message.LocalEndPoint = server.LocalEndPoint;
 
             Console.Write("Введите сообщение или Exit для выхода: ");

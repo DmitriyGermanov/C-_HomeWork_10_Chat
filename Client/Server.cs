@@ -1,17 +1,15 @@
-﻿using Client.Messages.Fabric;
+﻿using Client.ClientMessenger;
 using Client.Messages;
+using Client.Messages.Fabric;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using Client.ClientMessenger;
 namespace Client
 {
     public delegate void IncomingMessage(BaseMessage message);
 
-    public class Server : IDisposable
+    public class Server
     {
         public event IncomingMessage? IncomingMessage;
-        private readonly UdpClient udpClient;
         private bool disposedValue;
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
@@ -20,21 +18,19 @@ namespace Client
         {
             get
             {
-                return (IPEndPoint)udpClient.Client.LocalEndPoint;
+                return messenger.GetServerEndPoint();
+                
             }
         }
-        public Server(UdpClient client) => udpClient = client;
         public Server()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
-            udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
         }
         public Server(CancellationTokenSource cancellationToken, IMessageSourceClient messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-            udpClient = new(new IPEndPoint(IPAddress.Loopback, 0));
             this.messenger = messenger;
         }
         public async Task WaitForAMessageAsync()
@@ -43,7 +39,7 @@ namespace Client
             {
                 try
                 {
-                    var receiveTask = messenger.RecieveMessageAsync(udpClient, cancellationToken.Token);
+                    var receiveTask = messenger.RecieveMessageAsync(cancellationToken.Token);
                     var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
                     if (completedTask == receiveTask)
                     {
@@ -84,24 +80,6 @@ namespace Client
             }
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    cancellationToken.Cancel();
-                    udpClient.Close();
-                    udpClient.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }
+
