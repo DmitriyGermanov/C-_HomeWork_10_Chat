@@ -12,12 +12,12 @@ namespace Client.ClientMessenger
         public NetMqMessenger()
         {
             _serverSocket = new ResponseSocket();
+            _serverSocket.Connect($"tcp://127.0.0.1:12345");
         }
 
         public async Task SendMessageAsync(BaseMessage message)
         {
             string jsonToSend = message.SerializeMessageToJson();
-            _serverSocket.Connect($"tcp://127.0.0.1:12345");
             _serverSocket.SendFrame(jsonToSend);
             await Task.CompletedTask;
         }

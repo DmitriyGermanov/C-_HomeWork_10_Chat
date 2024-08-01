@@ -7,14 +7,14 @@ namespace Client
 {
     public delegate void IncomingMessage(BaseMessage message);
 
-    public class Server
+    public class Server<T>
     {
         public event IncomingMessage? IncomingMessage;
         private bool disposedValue;
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
-        private IMessageSourceClient<IPEndPoint> messenger;
-        public IPEndPoint LocalEndPoint
+        private IMessageSourceClient<T> messenger;
+        public T ClientNetID
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Client
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
         }
-        public Server(CancellationTokenSource cancellationToken, IMessageSourceClient<IPEndPoint> messenger)
+        public Server(CancellationTokenSource cancellationToken, IMessageSourceClient<T> messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
@@ -58,7 +58,10 @@ namespace Client
                         }
                         else
                         {
-                            messenger.SendMessageAsync(new MessageCreatorAsk().FactoryMethod(LocalEndPoint));
+                            var askMessage = new MessageCreatorAsk().FactoryMethod();
+                            if (ClientNetID is IPEndPoint endPoint)
+                                askMessage.LocalEndPoint = endPoint;
+                            messenger.SendMessageAsync(message);
                         }
 
                     }

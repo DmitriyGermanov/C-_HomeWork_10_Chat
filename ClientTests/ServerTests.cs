@@ -16,7 +16,7 @@ namespace ClientTests
             var mockMessenger = new Mock<IMessageSourceClient<IPEndPoint>>();
             var udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
             var cts = new CancellationTokenSource();
-            var server = new Server(cts, mockMessenger.Object);
+            var server = new Server<IPEndPoint>(cts, mockMessenger.Object);
 
             var testMessage = new DefaultMessage { NicknameFrom = "TestUser", Text = "Test Message", Ask = false };
             mockMessenger.Setup(m => m.RecieveMessageAsync(cts.Token))
@@ -38,7 +38,7 @@ namespace ClientTests
         {
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             var mockClientManager = new Mock<IMessageSourceClient<IPEndPoint>>();
-            var server = new Server(cancellationTokenSource, mockClientManager.Object);
+            var server = new Server<IPEndPoint>(cancellationTokenSource, mockClientManager.Object);
             var serverTask = Task.Run(() => server.WaitForAMessageAsync());
             cancellationTokenSource.Cancel();
             await serverTask;

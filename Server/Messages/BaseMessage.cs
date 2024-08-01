@@ -19,6 +19,7 @@ namespace Server.Messages
         public virtual ClientBase ClientTo { get; set; }
         [JsonIgnore]
         public virtual ClientBase ClientFrom { get; set; }
+        public byte[] ClientNetId { get; set; }
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }

@@ -1,6 +1,4 @@
 ﻿using Client.Messages;
-using System.Net;
-using System.Net.Sockets;
 
 namespace Client.ClientMessenger
 {

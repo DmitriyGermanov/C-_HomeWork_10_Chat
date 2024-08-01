@@ -26,8 +26,9 @@ namespace Server.ServerMessenger
             if (_disposed)
                 throw new ObjectDisposedException(nameof(NetMqMessenger));
 
-            var message = await _serverSocket.ReceiveFrameStringAsync(ctoken);
-            return BaseMessage.DeserializeFromJson(message.Item1);
+            var incomingFrame = await _serverSocket.ReceiveFrameStringAsync(ctoken);
+            var message = BaseMessage.DeserializeFromJson(incomingFrame.Item1);
+            return message;
         }
 
         public byte[] GetServerEndPoint()

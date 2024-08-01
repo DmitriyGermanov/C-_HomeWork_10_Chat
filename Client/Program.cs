@@ -15,7 +15,7 @@ namespace Client
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             IMessageSourceClient<IPEndPoint> messenger = new UdpMessenger();
-            Server server = new Server(cancellationTokenSource, messenger);
+            var server = new Server<IPEndPoint> (cancellationTokenSource, messenger);
             server.IncomingMessage += (BaseMessage message) =>
             {
                 Messages.Push(message);
@@ -47,8 +47,8 @@ namespace Client
             Console.WriteLine("Введите Ваш Ник: ");
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
-            message.LocalEndPoint = server.LocalEndPoint;
-            Console.Write("Введите сообщение или Exit для выхода: ");
+            if (server.ClientNetID is IPEndPoint endPoint)
+                message.LocalEndPoint = endPoint;
             do
             {
                 message.Text = Console.ReadLine();
