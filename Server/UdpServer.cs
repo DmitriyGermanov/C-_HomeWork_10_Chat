@@ -71,7 +71,7 @@ namespace Server
         }
         private async Task ProcessMessage(BaseMessage message)
         {
-            IPEndPointClient client = clientList.GetClientByName(message.NicknameFrom);
+            var client = clientList.GetClientByName(message.NicknameFrom);
 
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
