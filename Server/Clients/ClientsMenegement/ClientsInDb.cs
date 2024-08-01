@@ -3,6 +3,7 @@ namespace Server.Clients.ClientsMenegement
 {
     public class ClientsInDb : IClientMeneger
     {
+//to-do: заменить возвращаемые типы на clientbase
         public void ClientRegistration(BaseMessage message)
         {
             Console.WriteLine("сработал ClientReg");
