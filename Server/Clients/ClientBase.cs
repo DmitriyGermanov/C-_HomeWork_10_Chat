@@ -8,8 +8,7 @@ namespace Server.Clients
 {
     public abstract class ClientBase
     {
-        protected IClientMeneger mediator;
-
+        private IClientMeneger mediator;
         private int clientID;
         private string name;
         private DateTime askTime;
@@ -18,9 +17,6 @@ namespace Server.Clients
         public virtual ICollection<BaseMessage> MessagesTo { get; set; }
         [JsonIgnore]
         public virtual ICollection<BaseMessage> MessagesFrom { get; set; }
-    
-
-       
         public virtual IClientMeneger Mediator { get { return mediator; } set { } }
         public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
         public virtual int ClientID
@@ -48,8 +44,8 @@ namespace Server.Clients
         {
         }
 
-        public abstract void Send (BaseMessage message, IClientMeneger mediator);
-        public abstract void Receive (BaseMessage message);
+        public abstract void Send(BaseMessage message, IClientMeneger mediator);
+        public abstract void Receive(BaseMessage message);
         internal abstract Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms);
     }
 }

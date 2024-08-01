@@ -11,7 +11,7 @@ using Server;
 namespace Server.Migrations
 {
     [DbContext(typeof(UdpServerContext))]
-    [Migration("20240722113309_InitialCreate")]
+    [Migration("20240801160039_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace Server.Migrations
                 .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Server.Clients.ServerClient", b =>
+            modelBuilder.Entity("Server.Clients.ClientBase", b =>
                 {
                     b.Property<int>("ClientID")
                         .ValueGeneratedOnAdd()
@@ -34,14 +34,13 @@ namespace Server.Migrations
                     b.Property<DateTime>("AskTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("IpEndPointToString")
+                    b.Property<string>("ClientType")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(21)
+                        .HasColumnType("varchar(21)");
 
-                    b.Property<sbyte>("IsOnline")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint")
-                        .HasDefaultValue((sbyte)0);
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -50,15 +49,16 @@ namespace Server.Migrations
                         .HasColumnName("Name");
 
                     b.HasKey("ClientID")
-                        .HasName("user_pkey");
+                        .HasName("PK_ClientID");
 
                     b.HasIndex("ClientID")
                         .IsUnique();
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.ToTable("Clients", (string)null);
 
-                    b.ToTable("clients", (string)null);
+                    b.HasDiscriminator<string>("ClientType").HasValue("ClientBase");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Server.Messages.BaseMessage", b =>
@@ -77,6 +77,7 @@ namespace Server.Migrations
                         .HasColumnType("varchar(21)");
 
                     b.Property<string>("Text")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("Text");
 
@@ -87,17 +88,29 @@ namespace Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MessageID")
-                        .HasName("message_pkey");
+                        .HasName("PK_MessageID");
 
                     b.HasIndex("UserIDFrom");
 
                     b.HasIndex("UserIdTo");
 
-                    b.ToTable("messages", (string)null);
+                    b.ToTable("Messages", (string)null);
 
                     b.HasDiscriminator().HasValue("BaseMessage");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Server.Clients.IPEndPointClient", b =>
+                {
+                    b.HasBaseType("Server.Clients.ClientBase");
+
+                    b.Property<string>("IpEndPointToString")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("IpEndPointToString");
+
+                    b.HasDiscriminator().HasValue("IPEndPointClient");
                 });
 
             modelBuilder.Entity("Server.Messages.DefaultMessage", b =>
@@ -109,11 +122,11 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Messages.BaseMessage", b =>
                 {
-                    b.HasOne("Server.Clients.ServerClient", "ClientFrom")
+                    b.HasOne("Server.Clients.ClientBase", "ClientFrom")
                         .WithMany("MessagesFrom")
                         .HasForeignKey("UserIDFrom");
 
-                    b.HasOne("Server.Clients.ServerClient", "ClientTo")
+                    b.HasOne("Server.Clients.ClientBase", "ClientTo")
                         .WithMany("MessagesTo")
                         .HasForeignKey("UserIdTo");
 
@@ -122,7 +135,7 @@ namespace Server.Migrations
                     b.Navigation("ClientTo");
                 });
 
-            modelBuilder.Entity("Server.Clients.ServerClient", b =>
+            modelBuilder.Entity("Server.Clients.ClientBase", b =>
                 {
                     b.Navigation("MessagesFrom");
 

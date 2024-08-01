@@ -16,29 +16,30 @@ namespace Server.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "clients",
+                name: "Clients",
                 columns: table => new
                 {
                     ClientID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    IsOnline = table.Column<sbyte>(type: "tinyint", nullable: false, defaultValue: (sbyte)0),
-                    Name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    IsOnline = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AskTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    IpEndPointToString = table.Column<string>(type: "longtext", nullable: false)
+                    Name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    ClientType = table.Column<string>(type: "varchar(21)", maxLength: 21, nullable: false),
+                    IpEndPointToString = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_pkey", x => x.ClientID);
+                    table.PrimaryKey("PK_ClientID", x => x.ClientID);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "messages",
+                name: "Messages",
                 columns: table => new
                 {
                     MessageID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Text = table.Column<string>(type: "longtext", nullable: true),
+                    Text = table.Column<string>(type: "longtext", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UserIDFrom = table.Column<int>(type: "int", nullable: true),
                     UserIdTo = table.Column<int>(type: "int", nullable: true),
@@ -46,40 +47,34 @@ namespace Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("message_pkey", x => x.MessageID);
+                    table.PrimaryKey("PK_MessageID", x => x.MessageID);
                     table.ForeignKey(
-                        name: "FK_messages_clients_UserIDFrom",
+                        name: "FK_Messages_Clients_UserIDFrom",
                         column: x => x.UserIDFrom,
-                        principalTable: "clients",
+                        principalTable: "Clients",
                         principalColumn: "ClientID");
                     table.ForeignKey(
-                        name: "FK_messages_clients_UserIdTo",
+                        name: "FK_Messages_Clients_UserIdTo",
                         column: x => x.UserIdTo,
-                        principalTable: "clients",
+                        principalTable: "Clients",
                         principalColumn: "ClientID");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_clients_ClientID",
-                table: "clients",
+                name: "IX_Clients_ClientID",
+                table: "Clients",
                 column: "ClientID",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_clients_Name",
-                table: "clients",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_messages_UserIDFrom",
-                table: "messages",
+                name: "IX_Messages_UserIDFrom",
+                table: "Messages",
                 column: "UserIDFrom");
 
             migrationBuilder.CreateIndex(
-                name: "IX_messages_UserIdTo",
-                table: "messages",
+                name: "IX_Messages_UserIdTo",
+                table: "Messages",
                 column: "UserIdTo");
         }
 
@@ -87,10 +82,10 @@ namespace Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "messages");
+                name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "clients");
+                name: "Clients");
         }
     }
 }

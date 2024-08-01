@@ -3,7 +3,7 @@ namespace Server.Clients.ClientsMenegement
 {
     public class ClientsInDb : IClientMeneger
     {
-//to-do: заменить возвращаемые типы на clientbase
+        //to-do: заменить возвращаемые типы на clientbase
         public void ClientRegistration(BaseMessage message)
         {
             Console.WriteLine("сработал ClientReg");
@@ -13,37 +13,50 @@ namespace Server.Clients.ClientsMenegement
             {
                 existingClient.IsOnline = true;
                 existingClient.AskTime = DateTime.Now;
-                existingClient.IpEndPointToString = message.LocalEndPointString;
+                if (existingClient is IPEndPointClient client)
+                    client.IpEndPointToString = message.LocalEndPointString;
+                else
+                {
+                    //Добавить реализацию для NetMQ
+                }
                 ctx.SaveChanges();
             }
             else
             {
-//добавляем логику, что опр тип клиента добавляется, если выбран определенный тип контекста.
-                IPEndPointClient client = new IPEndPointClient
+                //добавляем логику, что опр тип клиента добавляется, если выбран определенный тип контекста.
+                if (ctx is UdpServerContext)
                 {
-                    Name = message.NicknameFrom,
-                    AskTime = DateTime.Now,
-                    IsOnline = true,
-                    IpEndPointToString = message.LocalEndPointString,
+                    IPEndPointClient client = new IPEndPointClient
+                    {
+                        Name = message.NicknameFrom,
+                        AskTime = DateTime.Now,
+                        IsOnline = true,
+                        IpEndPointToString = message.LocalEndPointString,
 
-                };
-                ctx.Add(client);
-                ctx.SaveChanges();
+                    };
+
+                    ctx.Add(client);
+                    ctx.SaveChanges();
+                }
+                else
+                {
+                    //Добавить реализацию для NetMQ
+                }
             }
         }
 
-        public IPEndPointClient GetClientByName(string name)
+        public ClientBase GetClientByName(string name)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
         }
-        public IPEndPointClient GetClientByID(int? clientId)
+        public ClientBase GetClientByID(int? clientId)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.ClientID == clientId);
         }
 
-        public void SetClientAskTime(IPEndPointClient client, BaseMessage message)
+        public void SetClientAskTime(ClientBase client, BaseMessage message)
         {
             Console.WriteLine("сработал SetClientAskTimeInDb");
             using var ctx = new UdpServerContext();
@@ -52,7 +65,14 @@ namespace Server.Clients.ClientsMenegement
                 ctx.Attach(client);
                 client.IsOnline = true;
                 client.AskTime = DateTime.Now;
-                client.IpEndPointToString = message.LocalEndPointString;
+                if (client is IPEndPointClient ipClient)
+                {
+                    ipClient.IpEndPointToString = message.LocalEndPointString;
+                }
+                else
+                {
+                    //Добавить реализацию для NetMQ
+                }
                 ctx.SaveChanges();
             }
             else
@@ -61,7 +81,7 @@ namespace Server.Clients.ClientsMenegement
             }
         }
 
-        public void SetClientOffline(IPEndPointClient client)
+        public void SetClientOffline(ClientBase client)
         {
             Console.WriteLine("сработал SetClientOfflineInDb");
             using var ctx = new UdpServerContext();
@@ -76,7 +96,7 @@ namespace Server.Clients.ClientsMenegement
                 throw new Exception("Ошибка! Клиент не найден методом SetClientOfflineInDb, проверьте логику работы");
             }
         }
-        public  void Send(BaseMessage message, IPEndPointClient client)
+        public void Send(BaseMessage message, ClientBase client)
         {
             Console.WriteLine("сработал SendToAll");
             using var ctx = new UdpServerContext();

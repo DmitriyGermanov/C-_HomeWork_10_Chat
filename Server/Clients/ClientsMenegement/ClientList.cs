@@ -9,7 +9,7 @@ namespace Server.clients.clientsMenegement
     {
         //TODO: Для базы нужен будет синглтон
         //TODO: Переделываем на Dictionary<Client, Stack<Message> Логика: для каждого Client в Dictionary копим Stack Message, если клиент IsOnline держим Stack.Count = 0, если клиент IsOffline копим Stack (при смене статуса отдельным методом опустошаем Stack). Если статус Client IsOffline, то Server не делает Invoke и передает управление накопительному методу, если статус Client IsOnline, то делается Invoke => message поступает в Program, Client отправитель записывается в ClientFrom. Метод проверяет есть ли в Stack этого клиента message и освобождает Stack отправляя messages клиенту.
-        private List<IPEndPointClient> clients;
+        private List<ClientBase> clients;
 
         public ClientList()
         {
@@ -18,8 +18,7 @@ namespace Server.clients.clientsMenegement
 
         public virtual void ClientRegistration(BaseMessage message)
         {
-            IPEndPointClient client = clients.Find(client => client.ClientEndPoint.Equals(message.LocalEndPoint));
-            if (client == null)
+            var client = clients.Find(client => client is IPEndPointClient ipClient && ipClient.ClientEndPoint.Equals(message.LocalEndPoint)); if (client == null)
             {
                 clients.Add(new IPEndPointClient() { Name = message.NicknameFrom, ClientEndPoint = message.LocalEndPoint, AskTime = DateTime.Now, IsOnline = true });
 
@@ -34,20 +33,28 @@ namespace Server.clients.clientsMenegement
             }
 
         }
-        public IPEndPointClient? GetClientByName(string name) => clients.Find(client => client.Name.Equals(name));
-        public IPEndPointClient? GetClientByID(int? id) => clients.Find(client => client.ClientID.Equals(id));
-        public IPEndPointClient? GetClientByEndPoint(IPEndPoint clientEndPoint)
+        public ClientBase? GetClientByName(string name) => clients.Find(client => client.Name.Equals(name));
+        public ClientBase? GetClientByID(int? id) => clients.Find(client => client.ClientID.Equals(id));
+        public ClientBase? GetClientByEndPoint(IPEndPoint clientEndPoint)
         {
-            if (clientEndPoint != null)
-                return clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint));
+            if (clientEndPoint != null )
+                return clients.Find(client => client is IPEndPointClient ipClient && ipClient.Equals(clientEndPoint));
             else
                 return null;
         }
-        public bool RemoveClientByEndPoint(IPEndPoint clientEndPoint) => clients.Remove(clients.Find(client => client.ClientEndPoint.Equals(clientEndPoint)));
-        public void SetClientOffline(IPEndPointClient client) => client.IsOnline = false;
-        public void SetClientAskTime(IPEndPointClient client, BaseMessage message) { }
+        public bool RemoveClientByEndPoint(ClientBase clientEndPoint)
+        {
+            var clientToRemove = clients.Find(client => client is IPEndPointClient ipClient && ipClient.Equals(clientEndPoint));
+            if (clientToRemove != null)
+            {
+                return clients.Remove(clientToRemove);
+            }
+            return false;
+        }
+        public void SetClientOffline(ClientBase client) => client.IsOnline = false;
+        public void SetClientAskTime(ClientBase client, BaseMessage message) { }
 
-        public  void Send(BaseMessage message, IPEndPointClient client)
+        public  void Send(BaseMessage message, ClientBase client)
         {
             if (client != null)
             {

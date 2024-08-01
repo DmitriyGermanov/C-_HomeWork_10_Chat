@@ -31,7 +31,7 @@ namespace Server.Messages.MesagesMenegement
             }
         }
 
-       public async Task ShowUnrecievedMessagesAsync<T>(IPEndPointClient serverClient, IMessageSourceServer<T> ms)
+       public async Task ShowUnrecievedMessagesAsync<T>(ClientBase serverClient, IMessageSourceServer<T> ms)
         {
             Console.WriteLine("Сработал ShowUnrecievedMessages");
             using (var ctx = new UdpServerContext())
