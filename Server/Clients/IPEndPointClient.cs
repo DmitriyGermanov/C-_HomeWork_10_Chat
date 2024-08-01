@@ -13,49 +13,16 @@ delete: он удаляет клиента из списка
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Server.Clients
 {
-    public class ServerClient : ClientBase
+    public class IPEndPointClient : ClientBase
     {
-
-
-        public ServerClient()
-        { }
-
-        private int clientID;
-        private string name;
         private IPEndPoint clientEndPoint;
-        private DateTime askTime;
-        private bool isOnline;
-        [JsonIgnore]
-        public virtual ICollection<BaseMessage> MessagesTo { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<BaseMessage> MessagesFrom { get; set; }
-        public bool IsOnline { get { return isOnline; } set { isOnline = value; } }
-        public virtual int ClientID
-        {
-            get { return clientID; }
-            set { clientID = value; }
-        }
-
-        public virtual string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
         public virtual IPEndPoint ClientEndPoint
         {
             get { return clientEndPoint; }
             set { clientEndPoint = value; }
         }
-
-        public virtual DateTime AskTime
-        {
-            get { return askTime; }
-            set { askTime = value; }
-        }
-
-
-
+        public IPEndPointClient()
+        { }
         public virtual string IpEndPointToString
         {
             get { return clientEndPoint?.ToString(); }
@@ -73,6 +40,7 @@ namespace Server.Clients
                     clientEndPoint = result;
             }
         }
+
         public override void Receive(BaseMessage message)
         {
             Task.Run(() =>
@@ -88,10 +56,14 @@ namespace Server.Clients
 
         public override string? ToString()
         {
-            return $"Клиент в базе: {name} с {clientEndPoint.ToString()}";
+            return $"Клиент в базе: {Name} с {ClientEndPoint.ToString()}";
         }
         //To-do: убрать, оставить только в messenger
-        internal async Task SendToClientAsync(ServerClient? client, BaseMessage message) => await new UdpMessenger().SendMessageAsync(message, client.clientEndPoint);
+        internal override async Task SendToClientAsync<IPEndPoint>(ClientBase? client, BaseMessage message, IMessageSourceServer<IPEndPoint> ms)
+        {
+            if (client is IPEndPointClient ipClient)
+                await new UdpMessenger().SendMessageAsync(message, ipClient.clientEndPoint);
+        }
 
     }
 }

@@ -16,9 +16,9 @@ namespace Server.Messages
         public int? UserIDFrom { get; set; }
         public int? UserIdTo { get; set; }
         [JsonIgnore]
-        public virtual ServerClient ClientTo { get; set; }
+        public virtual ClientBase ClientTo { get; set; }
         [JsonIgnore]
-        public virtual ServerClient ClientFrom { get; set; }
+        public virtual ClientBase ClientFrom { get; set; }
         public bool Ask { get; set; }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }

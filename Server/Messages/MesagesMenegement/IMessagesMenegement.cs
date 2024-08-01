@@ -1,9 +1,10 @@
 ﻿using Server.Clients;
+using Server.ServerMessenger;
 
 namespace Server.Messages.MesagesMenegement
 {
     public interface IMessagesMenegement
     {
-        Task ShowUnrecievedMessagesAsync(ServerClient serverClient);
+        Task ShowUnrecievedMessagesAsync<T>(IPEndPointClient serverClient, IMessageSourceServer<T> ms);
     }
 }

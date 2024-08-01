@@ -17,7 +17,7 @@ namespace Server.Clients.ClientsMenegement
             }
             else
             {
-                ServerClient client = new ServerClient
+                IPEndPointClient client = new IPEndPointClient
                 {
                     Name = message.NicknameFrom,
                     AskTime = DateTime.Now,
@@ -30,18 +30,18 @@ namespace Server.Clients.ClientsMenegement
             }
         }
 
-        public ServerClient GetClientByName(string name)
+        public IPEndPointClient GetClientByName(string name)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
         }
-        public ServerClient GetClientByID(int? clientId)
+        public IPEndPointClient GetClientByID(int? clientId)
         {
             using var ctx = new UdpServerContext();
             return ctx.Clients.FirstOrDefault(c => c.ClientID == clientId);
         }
 
-        public void SetClientAskTime(ServerClient client, BaseMessage message)
+        public void SetClientAskTime(IPEndPointClient client, BaseMessage message)
         {
             Console.WriteLine("сработал SetClientAskTimeInDb");
             using var ctx = new UdpServerContext();
@@ -59,7 +59,7 @@ namespace Server.Clients.ClientsMenegement
             }
         }
 
-        public void SetClientOffline(ServerClient client)
+        public void SetClientOffline(IPEndPointClient client)
         {
             Console.WriteLine("сработал SetClientOfflineInDb");
             using var ctx = new UdpServerContext();
@@ -74,7 +74,7 @@ namespace Server.Clients.ClientsMenegement
                 throw new Exception("Ошибка! Клиент не найден методом SetClientOfflineInDb, проверьте логику работы");
             }
         }
-        public  void Send(BaseMessage message, ServerClient client)
+        public  void Send(BaseMessage message, IPEndPointClient client)
         {
             Console.WriteLine("сработал SendToAll");
             using var ctx = new UdpServerContext();

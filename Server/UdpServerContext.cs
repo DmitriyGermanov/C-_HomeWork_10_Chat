@@ -7,7 +7,7 @@ namespace Server
 {
     internal class UdpServerContext : DbContext
     {
-        public DbSet<ServerClient> Clients { get; set; }
+        public DbSet<IPEndPointClient> Clients { get; set; }
         public DbSet<BaseMessage> Messages { get; set; }
         public DbSet<DefaultMessage> DefaultMessages { get; set; }
         /*        public DbSet<Mediator> Mediator { get; set; }
@@ -22,7 +22,7 @@ namespace Server
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             {
-                modelBuilder.Entity<ServerClient>(entity =>
+                modelBuilder.Entity<IPEndPointClient>(entity =>
                 {
                     entity.HasKey(e => e.ClientID).HasName("user_pkey");
                     /*                    entity.Property(e => e.ClientID)

@@ -1,6 +1,7 @@
 ﻿using Server.Clients;
 using Server.Clients.ClientsMenegement;
 using Server.Messages.Fabric;
+using Server.ServerMessenger;
 
 namespace Server.Messages.MesagesMenegement
 {
@@ -30,7 +31,7 @@ namespace Server.Messages.MesagesMenegement
             }
         }
 
-       public async Task ShowUnrecievedMessagesAsync(ServerClient serverClient)
+       public async Task ShowUnrecievedMessagesAsync<T>(IPEndPointClient serverClient, IMessageSourceServer<T> ms)
         {
             Console.WriteLine("Сработал ShowUnrecievedMessages");
             using (var ctx = new UdpServerContext())
@@ -45,9 +46,9 @@ namespace Server.Messages.MesagesMenegement
                         {
                             message.NicknameFrom = clientsInDb.GetClientByID(message.UserIDFrom).Name;
                             Console.WriteLine(message);
-                            await serverClient.SendToClientAsync(serverClient, message);
+                            await serverClient.SendToClientAsync(serverClient, message, ms);
                         }
-                        await serverClient.SendToClientAsync(serverClient, new MessageCreatorDefault().FactoryMethodWIthText($"У вас {messages.Count} непрочитанных сообщений:"));
+                        await serverClient.SendToClientAsync(serverClient, new MessageCreatorDefault().FactoryMethodWIthText($"У вас {messages.Count} непрочитанных сообщений:"), ms);
 
                         ctx.Messages.RemoveRange(messages);
                         await ctx.SaveChangesAsync();

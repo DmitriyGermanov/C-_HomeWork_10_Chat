@@ -4,12 +4,12 @@ namespace Server.Clients.ClientsMenegement
 {
     public interface IClientMeneger
     {
-        public void Send(BaseMessage message, ServerClient client);
+        public void Send(BaseMessage message, IPEndPointClient client);
         public void ClientRegistration(BaseMessage message);
-        public ServerClient GetClientByName(string name);
-        public ServerClient GetClientByID(int? clientId);
-        public void SetClientAskTime(ServerClient client, BaseMessage message);
-        internal void SetClientOffline(ServerClient client);
+        public IPEndPointClient GetClientByName(string name);
+        public IPEndPointClient GetClientByID(int? clientId);
+        public void SetClientAskTime(IPEndPointClient client, BaseMessage message);
+        internal void SetClientOffline(IPEndPointClient client);
 
     }
 }

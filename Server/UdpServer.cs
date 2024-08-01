@@ -17,6 +17,7 @@ namespace Server
         private IClientMeneger clientList;
         private IMessagesMenegement _messageMenegerInDb;
         private IMessageSourceServer<IPEndPoint> _messenger;
+        public IMessageSourceServer<IPEndPoint> Messenger { get => _messenger; private set { } }
 
         public UdpServer()
         {
@@ -70,7 +71,7 @@ namespace Server
         }
         private async Task ProcessMessage(BaseMessage message)
         {
-            ServerClient client = clientList.GetClientByName(message.NicknameFrom);
+            IPEndPointClient client = clientList.GetClientByName(message.NicknameFrom);
 
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
@@ -82,7 +83,7 @@ namespace Server
             else if (client != null && !client.IsOnline && !message.Ask)
             {
                 clientList.SetClientAskTime(client, message);
-                _messageMenegerInDb.ShowUnrecievedMessagesAsync(client);
+                _messageMenegerInDb.ShowUnrecievedMessagesAsync(client, _messenger);
                 IncomingMessage?.Invoke(message);
             }
             /*                    else if (client != null && message.Ask && !message.UserDoesNotExist && !message.DisconnectRequest)

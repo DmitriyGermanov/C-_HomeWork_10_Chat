@@ -7,46 +7,46 @@ using Server.ServerMessenger;
 using System.Net;
 namespace Server
 {
-    public class MessageCollector
+    public class MessageCollector<T>
     {
         private CancellationTokenSource? cancellationToken;
         private CancellationToken cToken;
-        private Stack<IPEndPoint> endPoints;
-        public virtual Stack<IPEndPoint> EndPoints => endPoints;
+        private Stack<T> endPoints;
+        public virtual Stack<T> EndPoints => endPoints;
         private BaseMessage? message;
         private static Stack<BaseMessage>? messages = new();
         private IClientMeneger? clientList;
-        private IMessageSourceServer<IPEndPoint> _messenger;
-        public MessageCollector()
+        private IMessageSourceServer<T> _messenger;
+        public MessageCollector(IMessageSourceServer<T> messenger)
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
-            endPoints = new Stack<IPEndPoint>();
-            _messenger = new UdpMessenger();
+            endPoints = new Stack<T>();
+            _messenger = messenger;
         }
-        internal MessageCollector(CancellationTokenSource cancellationToken, IClientMeneger clientList)
+        internal MessageCollector(CancellationTokenSource cancellationToken, IClientMeneger clientList, IMessageSourceServer<T> messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-            endPoints = new Stack<IPEndPoint>();
+            endPoints = new Stack<T>();
             this.clientList = clientList;
-            _messenger = new UdpMessenger();
+            _messenger = messenger;
         }
-        internal MessageCollector(CancellationTokenSource cancellationToken, BaseMessage message)
+        internal MessageCollector(CancellationTokenSource cancellationToken, BaseMessage message, IMessageSourceServer<T> messenger)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-            endPoints = new Stack<IPEndPoint>();
+            endPoints = new Stack<T>();
             this.message = message;
-            _messenger = new UdpMessenger();
+            _messenger = messenger;
         }
-        public void EndpointCollector(IPEndPoint endPoint) => endPoints.Push(endPoint);
+        public void EndpointCollector(T endPoint) => endPoints.Push(endPoint);
         internal void MessagesCollector(BaseMessage message) => messages.Push(message);
 
         public async Task SendMessagesFromRow()
         {
-            ServerClient? clientFrom = new();
-            ServerClient? clientTo = new();
+            ClientBase? clientFrom;
+            ClientBase? clientTo;
             while (!cToken.IsCancellationRequested)
             {
                 if (messages.Count > 0)
@@ -63,18 +63,18 @@ namespace Server
                     }
                     else if (clientFrom != null && clientTo != null && clientTo.IsOnline)
                     {
-                        clientFrom.SendToClientAsync(clientTo, message);
+                        clientFrom.SendToClientAsync(clientTo, message, _messenger);
                     }
                     else if (clientFrom != null && clientTo != null && !clientTo.IsOnline)
                     {
-                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod());
+                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsOnlineCreator().FactoryMethod(), _messenger);
                         message.ClientTo = clientTo;
                         message.ClientFrom = clientFrom;
                         MessagesMenegementInDb.SaveMessageToDb(message);
                     }
                     else if (clientTo == null && clientFrom != null)
                     {
-                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod());
+                        clientFrom.SendToClientAsync(clientFrom, new MessageCreatorUserIsNotExistCreator().FactoryMethod(), _messenger);
                     }
                 }
                 else
@@ -90,7 +90,7 @@ namespace Server
             {
                 if (endPoints.Count > 0)
                 {
-                    await UdpMessenger.SendMessageAsync(message, endPoints.Pop());
+                    await _messenger.SendMessageAsync(message, endPoints.Pop());
                 }
 
                 else

@@ -1,19 +1,20 @@
 ﻿using Server.Clients.ClientsMenegement;
 using Server.Messages;
+using System.Net;
 
 namespace Server
 {
     internal class Program
     {
         private static CancellationTokenSource cancellationTokenSource = new();
-        private static MessageCollector? messageCollector;
+        private static MessageCollector<IPEndPoint>? messageCollector;
         private static IClientMeneger? clientInDbMeneger;
         static void Main(string[] args)
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             clientInDbMeneger = new ClientsInDb();
             UdpServer server = new UdpServer(cancellationTokenSource, clientInDbMeneger);
-            messageCollector = new MessageCollector(cancellationTokenSource, clientInDbMeneger);
+            messageCollector = new MessageCollector<IPEndPoint>(cancellationTokenSource, clientInDbMeneger, server.Messenger);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);
             Task messengerAnswerToEndpointsRow = Task.Run(() => messageCollector.SendAnswerFromEndpointRow());
