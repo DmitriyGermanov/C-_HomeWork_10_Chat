@@ -15,15 +15,10 @@ namespace Server.Clients.ClientsMenegement
                 existingClient.AskTime = DateTime.Now;
                 if (existingClient is IPEndPointClient client)
                     client.IpEndPointToString = message.LocalEndPointString;
-                else
-                {
-                    //Добавить реализацию для NetMQ
-                }
                 ctx.SaveChanges();
             }
             else
             {
-                //добавляем логику, что опр тип клиента добавляется, если выбран определенный тип контекста.
                 if (ctx is UdpServerContext)
                 {
                     IPEndPointClient client = new IPEndPointClient
@@ -40,7 +35,15 @@ namespace Server.Clients.ClientsMenegement
                 }
                 else
                 {
-                    //Добавить реализацию для NetMQ
+                    NetMqClient client = new NetMqClient
+                    {
+                        Name = message.NicknameFrom,
+                        AskTime = DateTime.Now,
+                        IsOnline = true,
+                        ClientNetId = message.ClientNetId,
+                    };
+                    ctx.Add(client);
+                    ctx.SaveChanges();
                 }
             }
         }
@@ -69,9 +72,9 @@ namespace Server.Clients.ClientsMenegement
                 {
                     ipClient.IpEndPointToString = message.LocalEndPointString;
                 }
-                else
+                else if (client is NetMqClient netMqClient)
                 {
-                    //Добавить реализацию для NetMQ
+                    netMqClient.ClientNetId = message.ClientNetId;
                 }
                 ctx.SaveChanges();
             }

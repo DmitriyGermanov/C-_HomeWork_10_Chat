@@ -21,7 +21,6 @@ namespace Server
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Inheritance mapping for clients
             modelBuilder.Entity<ClientBase>(entity =>
             {
                 entity.HasKey(e => e.ClientID).HasName("PK_ClientID");
@@ -32,7 +31,7 @@ namespace Server
                       .HasMaxLength(255)
                       .IsRequired();
                 entity.HasDiscriminator<string>("ClientType")
-                      .HasValue<IPEndPointClient>("IPEndPointClient");
+                      .HasValue<IPEndPointClient>("IPEndPointClient").HasValue<NetMqClient>("NetMqClient"); ;
                 entity.Ignore(e => e.Mediator);
             });
 
@@ -41,6 +40,11 @@ namespace Server
                 entity.Property(e => e.IpEndPointToString)
                       .HasColumnName("IpEndPointToString");
                 entity.Ignore(e => e.ClientEndPoint);
+            });
+            modelBuilder.Entity<NetMqClient>(entity =>
+            {
+                entity.Property(e => e.ClientNetId)
+                         .HasColumnName("ClientNetID");
             });
 
 
