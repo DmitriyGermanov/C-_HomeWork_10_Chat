@@ -1,9 +1,6 @@
 ﻿using NetMQ;
 using NetMQ.Sockets;
 using Server.Messages;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Server.ServerMessenger
 {
