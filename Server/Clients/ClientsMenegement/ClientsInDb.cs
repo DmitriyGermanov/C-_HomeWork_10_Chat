@@ -17,6 +17,7 @@ namespace Server.Clients.ClientsMenegement
             }
             else
             {
+//добавляем логику, что опр тип клиента добавляется, если выбран определенный тип контекста.
                 IPEndPointClient client = new IPEndPointClient
                 {
                     Name = message.NicknameFrom,
