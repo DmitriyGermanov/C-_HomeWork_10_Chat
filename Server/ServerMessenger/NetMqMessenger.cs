@@ -1,21 +1,23 @@
 ﻿using NetMQ;
 using NetMQ.Sockets;
 using Server.Messages;
+using Server.Messages.Fabric;
 
 namespace Server.ServerMessenger
 {
     internal class NetMqMessenger : IMessageSourceServer<byte[]>, IDisposable
     {
-        private readonly PublisherSocket _publisherSocket;
+        private readonly RouterSocket _routerSocket;
         private bool _disposed = false;
         private NetMQRuntime _runtime;
-        private bool disposedValue;
         private bool disposedValue1;
+        private readonly Action<string> _messageHandler;
+
 
         public NetMqMessenger()
         {
-            _publisherSocket = new PublisherSocket();
-            _publisherSocket.Bind("tcp://*:12345");
+            _routerSocket = new RouterSocket();
+            _routerSocket.Bind("tcp://*:12345");
 
         }
 
@@ -23,24 +25,18 @@ namespace Server.ServerMessenger
         {
 
             string jsonToSend = message.SerializeMessageToJson();
-            _publisherSocket.SendMoreFrame(endPoint).SendFrame(jsonToSend);
+            _routerSocket.SendMoreFrame(endPoint).SendFrame(jsonToSend);
         }
 
         public async Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken)
         {
-            string incomingFrame = String.Empty;
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(NetMqMessenger));
-            try
-            {
-                incomingFrame = _publisherSocket.ReceiveFrameString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            var message = BaseMessage.DeserializeFromJson(incomingFrame);
+
+            var clientId = _routerSocket.ReceiveFrameBytes();
+            var df  = _routerSocket.ReceiveFrameString();
+            var message = BaseMessage.DeserializeFromJson(df);
+            message.ClientNetId = clientId;
             return message;
+
         }
 
         public byte[] GetServerEndPoint()
@@ -54,7 +50,7 @@ namespace Server.ServerMessenger
             {
                 if (disposing)
                 {
-                    _publisherSocket?.Dispose();
+                    _routerSocket?.Dispose();
                 }
 
 
@@ -62,7 +58,7 @@ namespace Server.ServerMessenger
             }
         }
 
-     
+
 
         public void Dispose()
         {

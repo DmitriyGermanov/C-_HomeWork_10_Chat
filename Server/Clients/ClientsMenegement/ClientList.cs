@@ -1,6 +1,7 @@
 ﻿using Server.Clients;
 using Server.Clients.ClientsMenegement;
 using Server.Messages;
+using Server.ServerMessenger;
 using System.Net;
 
 namespace Server.clients.clientsMenegement
@@ -10,11 +11,13 @@ namespace Server.clients.clientsMenegement
         //TODO: Для базы нужен будет синглтон
         //TODO: Переделываем на Dictionary<Client, Stack<Message> Логика: для каждого Client в Dictionary копим Stack Message, если клиент IsOnline держим Stack.Count = 0, если клиент IsOffline копим Stack (при смене статуса отдельным методом опустошаем Stack). Если статус Client IsOffline, то Server не делает Invoke и передает управление накопительному методу, если статус Client IsOnline, то делается Invoke => message поступает в Program, Client отправитель записывается в ClientFrom. Метод проверяет есть ли в Stack этого клиента message и освобождает Stack отправляя messages клиенту.
         private List<ClientBase> clients;
+        private IMessageSourceServer<byte[]> messageSourceServer;
 
-        public ClientList()
+        public ClientList(IMessageSourceServer<byte[]> ms)
         {
-            this.clients = new();
+            messageSourceServer = ms;
         }
+        
 
         public virtual void ClientRegistration(BaseMessage message)
         {
@@ -61,7 +64,7 @@ namespace Server.clients.clientsMenegement
                 clients.ForEach(thisClient =>
                 {
                     if (thisClient != client)
-                        thisClient.Receive(message);
+                        thisClient.Receive(message, messageSourceServer, message.ClientNetId);
                 });
             }
         }

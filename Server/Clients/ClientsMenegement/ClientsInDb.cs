@@ -1,8 +1,15 @@
 ﻿using Server.Messages;
+using Server.ServerMessenger;
 namespace Server.Clients.ClientsMenegement
 {
     public class ClientsInDb : IClientMeneger
     {
+        private IMessageSourceServer<byte[]> _messageSourceServer;
+        public ClientsInDb(IMessageSourceServer<byte[]> messageSourceServer)
+        {
+            _messageSourceServer = messageSourceServer;
+        }
+
         //to-do: заменить возвращаемые типы на clientbase
         public void ClientRegistration(BaseMessage message)
         {
@@ -19,7 +26,7 @@ namespace Server.Clients.ClientsMenegement
             }
             else
             {
-                if (ctx is UdpServerContext)
+                if (message.LocalEndPoint != null)
                 {
                     IPEndPointClient client = new IPEndPointClient
                     {
@@ -109,7 +116,8 @@ namespace Server.Clients.ClientsMenegement
                 {
                     if (!item.Name.Equals(client.Name) && item.IsOnline)
                     {
-                        item.Receive(message);
+                        Console.WriteLine(client);
+                        item.Receive(message, _messageSourceServer, message.ClientNetId);
                     }
                 }
             }

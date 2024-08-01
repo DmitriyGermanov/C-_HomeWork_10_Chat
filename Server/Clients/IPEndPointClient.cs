@@ -41,7 +41,7 @@ namespace Server.Clients
             }
         }
 
-        public override void Receive(BaseMessage message)
+        public override void Receive<IPEndPoint>(BaseMessage message, IMessageSourceServer<IPEndPoint> ms, IPEndPoint e)
         {
             Task.Run(() =>
             {

@@ -45,17 +45,15 @@ namespace Server
 
         public async Task SendMessagesFromRow()
         {
-            ClientBase? clientFrom;
-            ClientBase? clientTo;
             while (!cToken.IsCancellationRequested)
             {
                 if (messages.Count > 0)
                 {
                     //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
                     BaseMessage? message = messages.Pop();
-                    clientFrom = clientList.GetClientByName(message.NicknameFrom);
+                    var clientFrom = clientList.GetClientByName(message.NicknameFrom) as NetMqClient;
                     //TODO: Заблокировать возможность использовать ники повторно
-                    clientTo = clientList.GetClientByName(message.NicknameTo);
+                    var clientTo = clientList.GetClientByName(message.NicknameTo) as NetMqClient;
 
                     if (clientFrom != null && message.NicknameTo == "")
                     {

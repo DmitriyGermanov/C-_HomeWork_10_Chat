@@ -1,4 +1,5 @@
-﻿using Server.Clients.ClientsMenegement;
+﻿using Server.Clients;
+using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.Messages.MesagesMenegement;
 using Server.ServerMessenger;
@@ -14,25 +15,27 @@ namespace Server
         private CancellationTokenSource cancellationToken;
         private CancellationToken cToken;
         private IClientMeneger clientList;
+        public IClientMeneger ClientMeneger { get => clientList; private set { } }
         private IMessagesMenegement _messageMenegerInDb;
-        private IMessageSourceServer<IPEndPoint> _messenger;
-        public IMessageSourceServer<IPEndPoint> Messenger { get => _messenger; private set { } }
+        private IMessageSourceServer<byte[]> _messenger;
+        public IMessageSourceServer<byte[]> Messenger { get => _messenger; private set { } }
 
         public UdpServer()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
             this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
-            this._messenger = new UdpMessenger(new UdpClient(new IPEndPoint(IPAddress.Loopback, 12345)));
-            this.clientList = new ClientsInDb();
+            this._messenger = new NetMqMessenger();
+            this.clientList = new ClientsInDb(_messenger);
         }
-        public UdpServer(CancellationTokenSource cancellationToken, IClientMeneger clientList)
+        public UdpServer(CancellationTokenSource cancellationToken)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-            this.clientList = clientList;
+            
             this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
-            this._messenger = new UdpMessenger(new UdpClient(new IPEndPoint(IPAddress.Loopback, 12345)));
+            this._messenger = new NetMqMessenger();
+            this.clientList = new ClientsInDb(_messenger);
         }
 
         public async Task StartAsync()
@@ -70,11 +73,11 @@ namespace Server
         }
         private async Task ProcessMessage(BaseMessage message)
         {
-            var client = clientList.GetClientByName(message.NicknameFrom);
+            ClientBase client = clientList.GetClientByName(message.NicknameFrom);
 
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
-            if (client == null && message.LocalEndPoint != null)
+            if (client == null && message.LocalEndPoint != null || message.ClientNetId != null)
             {
                 clientList.ClientRegistration(message);
                 IncomingMessage?.Invoke(message);

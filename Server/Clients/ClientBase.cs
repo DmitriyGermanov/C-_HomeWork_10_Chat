@@ -45,7 +45,7 @@ namespace Server.Clients
         }
 
         public abstract void Send(BaseMessage message, IClientMeneger mediator);
-        public abstract void Receive(BaseMessage message);
+        public abstract void Receive<T>(BaseMessage message, IMessageSourceServer<T> ms, T endpoint);
         internal abstract Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms);
     }
 }

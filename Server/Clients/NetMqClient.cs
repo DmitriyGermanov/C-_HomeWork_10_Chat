@@ -1,4 +1,5 @@
-﻿using Server.Clients.ClientsMenegement;
+﻿using MySqlX.XDevAPI;
+using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.ServerMessenger;
 
@@ -7,20 +8,20 @@ namespace Server.Clients
     public class NetMqClient : ClientBase
     {
         private byte[] _clientNetId;
-        public byte[] ClientNetId
+        public virtual byte[] ClientNetId
         {
             get { return _clientNetId; }
             set { _clientNetId = value; }
         }
 
-        public override void Receive(BaseMessage message)
+        public override void Receive<T>(BaseMessage message, IMessageSourceServer<T> ms, T endpoint)
         {
-            throw new NotImplementedException();
+            ms.SendMessageAsync(message, _clientNetId);
         }
 
         public override void Send(BaseMessage message, IClientMeneger mediator)
         {
-            throw new NotImplementedException();
+            mediator.Send(message, this);
         }
 
         internal override Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms)
