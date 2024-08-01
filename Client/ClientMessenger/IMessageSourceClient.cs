@@ -6,7 +6,7 @@ namespace Client.ClientMessenger
 {
     public interface IMessageSourceClient<T> : IDisposable
     {
-        public Task SendMessageAsync(BaseMessage message);
+        public abstract Task SendMessageAsync(BaseMessage message);
         public Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken);
         public T GetServerEndPoint();
     }
