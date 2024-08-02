@@ -77,7 +77,7 @@ namespace Server
             
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
-            if (client == null && (message.LocalEndPoint != null || message.ClientNetId != null))
+            if (client == null)
             {
                 clientList.ClientRegistration(message);
                 IncomingMessage?.Invoke(message);

@@ -51,15 +51,16 @@ namespace Client
             Console.WriteLine("Введите Ваш Ник: ");
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
-            Console.Write("Введите сообщение или Exit для выхода: ");
             do
             {
+                Console.Write("Введите сообщение или Exit для выхода: ");
                 message.Text = Console.ReadLine();
                 if (message.Text.Equals("Exit"))
                 {
                     cancellationTokenSource.Cancel();
-                    //waitingForMessage.Wait();
+                    waitingForMessage.Wait();
                     printerTask.Wait();
+                 
                     Console.WriteLine("Спасибо за использование, возвращайтесь!");
                     message.DisconnectRequest = true;
                     message.Ask = true;

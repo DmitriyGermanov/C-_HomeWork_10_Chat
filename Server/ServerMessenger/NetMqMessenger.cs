@@ -26,6 +26,7 @@ namespace Server.ServerMessenger
 
             string jsonToSend = message.SerializeMessageToJson();
             _routerSocket.SendMoreFrame(endPoint).SendFrame(jsonToSend);
+            await Task.CompletedTask; 
         }
 
         public async Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken)

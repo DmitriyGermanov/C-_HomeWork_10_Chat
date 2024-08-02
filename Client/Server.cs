@@ -39,32 +39,12 @@ namespace Client
             {
                 try
                 {
-                    var receiveTask = messenger.RecieveMessageAsync(cancellationToken.Token);
-                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cancellationToken.Token));
+                    var receiveTask = Task.Run(() => messenger.RecieveMessageAsync(cToken), cToken);
+                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cToken));
                     if (completedTask == receiveTask)
                     {
                         BaseMessage? message = receiveTask.Result;
-                        if (!message.Ask)
-                        {
-                            IncomingMessage?.Invoke(message);
-                        }
-                        else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
-                        {
-                            IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Получатель не в сети, сообщение будет доставлено позже!"));
-                        }
-
-                        else if (message.Ask && message.UserDoesNotExist)
-                        {
-                            IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Такой получатель отсутствует!"));
-                        }
-                        else
-                        {
-                            var askMessage = new MessageCreatorAsk().FactoryMethod();
-                            if (ClientNetID is IPEndPoint endPoint)
-                                askMessage.LocalEndPoint = endPoint;
-                            messenger.SendMessageAsync(message);
-                        }
-
+                        HandleIncomingMessage(message);
                     }
                 }
                 catch (OperationCanceledException)
@@ -80,6 +60,35 @@ namespace Client
                 {
                     Console.WriteLine(ex);
                 }
+
+            }
+        }
+
+        private void HandleIncomingMessage(BaseMessage? message)
+        {
+            if (message == null)
+            {
+                return;
+            }
+
+            if (!message.Ask)
+            {
+                IncomingMessage?.Invoke(message);
+            }
+            else if (message.Ask && !message.UserIsOnline && !message.UserDoesNotExist)
+            {
+                IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Получатель не в сети, сообщение будет доставлено позже!"));
+            }
+            else if (message.Ask && message.UserDoesNotExist)
+            {
+                IncomingMessage?.Invoke(new MessageCreatorDefault().FactoryMethodWIthText("Такой получатель отсутствует!"));
+            }
+            else
+            {
+                var askMessage = new MessageCreatorAsk().FactoryMethod();
+                if (ClientNetID is IPEndPoint endPoint)
+                    askMessage.LocalEndPoint = endPoint;
+                messenger.SendMessageAsync(askMessage);
             }
         }
 

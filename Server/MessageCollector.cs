@@ -83,11 +83,14 @@ namespace Server
         }
         public async Task SendAnswerFromEndpointRow()
         {
-            BaseMessage? message = new MessageCreatorDefault().FactoryMethodWIthText("Сообщение было получено сервером");
+            
+            BaseMessage? message = new MessageCreatorDefault().FactoryMethodWIthText("Сообщение было получено серверо");
             while (!cToken.IsCancellationRequested)
             {
+                
                 if (endPoints.Count > 0)
                 {
+                    Console.WriteLine("Сработал SendAnswerFromEndpointRow");
                     await _messenger.SendMessageAsync(message, endPoints.Pop());
                 }
 

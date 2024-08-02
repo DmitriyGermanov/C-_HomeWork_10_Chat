@@ -57,10 +57,18 @@ namespace Server.Clients.ClientsMenegement
             }
         }
 
-        public ClientBase GetClientByName(string name)
+        public ClientBase? GetClientByName(string name)
         {
             using var ctx = new UdpServerContext();
-            return ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
+            var client = ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
+            if (client == null)
+            {
+                return null;
+            }
+            else
+            {
+                return client;
+            }
         }
         public ClientBase GetClientByID(int? clientId)
         {

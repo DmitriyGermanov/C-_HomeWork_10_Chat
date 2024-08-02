@@ -9,7 +9,6 @@ namespace Client.ClientMessenger
     {
         private readonly DealerSocket _dealerSocket;
         private bool _disposed = false;
-        private NetMQRuntime _runtime;
         private bool disposedValue;
 
         public NetMqMessenger()
@@ -28,12 +27,8 @@ namespace Client.ClientMessenger
 
         public async Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken)
         {
-
-            var clientId = _dealerSocket.ReceiveFrameBytes();
-            var df = _dealerSocket.ReceiveFrameString();
-            var message = BaseMessage.DeserializeFromJson(df);
-            message.ClientNetId = clientId;
-            return message;
+            var message = _dealerSocket.ReceiveFrameString();
+            return BaseMessage.DeserializeFromJson(message);
 
         }
 

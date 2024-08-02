@@ -16,7 +16,6 @@ namespace Server
             messageCollector = new MessageCollector<byte[]>(cancellationTokenSource, server.ClientMeneger, server.Messenger);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);
-            Console.WriteLine("Работа продолжена");
             Task messengerAnswerToEndpointsRow = Task.Run(() => messageCollector.SendAnswerFromEndpointRow());
             Task messengerAnswerToMessageRow = Task.Run(() => messageCollector.SendMessagesFromRow());
             Console.WriteLine("Сервер ждет сообщения от клиента (нажмите enter для остановки): ");
@@ -33,6 +32,7 @@ namespace Server
             Console.WriteLine(incomingMessage);
             
             messageCollector.MessagesCollector(incomingMessage);
+            
             messageCollector.EndpointCollector(incomingMessage.ClientNetId);
         }
     }
