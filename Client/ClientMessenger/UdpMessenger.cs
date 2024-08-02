@@ -7,7 +7,6 @@ namespace Client.ClientMessenger
 {
     public class UdpMessenger : IDisposable, IMessageSourceClient<IPEndPoint>
     {
-        private IPEndPoint? _localEndPoint;
         private UdpClient _udpClient;
         private bool _disposedValue;
         public UdpClient UdpClient { get => _udpClient; set => _udpClient = value; }
@@ -20,6 +19,7 @@ namespace Client.ClientMessenger
         public async Task SendMessageAsync(BaseMessage message)
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
+            message.LocalEndPoint = UdpClient.Client.LocalEndPoint as IPEndPoint;
             string jSonToSend = message.SerializeMessageToJson();
             byte[] data = System.Text.Encoding.UTF8.GetBytes(jSonToSend);
             await _udpClient.SendAsync(data, data.Length, remoteEndPoint);

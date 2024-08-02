@@ -1,6 +1,7 @@
 ﻿using Client.ClientMessenger;
 using Client.Messages;
 using Client.Messages.Fabric;
+using NetMQ;
 using System.Net;
 using System.Net.Sockets;
 namespace Client

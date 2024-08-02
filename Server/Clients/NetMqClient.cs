@@ -16,7 +16,7 @@ namespace Server.Clients
 
         public override void Receive<T>(BaseMessage message, IMessageSourceServer<T> ms, T endpoint)
         {
-            ms.SendMessageAsync(message, _clientNetId);
+            ms.SendMessageAsync(message, endpoint);
         }
 
         public override void Send(BaseMessage message, IClientMeneger mediator)

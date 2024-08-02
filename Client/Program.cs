@@ -2,6 +2,8 @@
 using Client.Messages.Fabric;
 using Client.ClientMessenger;
 using System.Net;
+using NetMQ;
+using NetMQ.Sockets;
 
 namespace Client
 {
@@ -13,9 +15,10 @@ namespace Client
         private static BaseMessageFabric messageFabric;
         static async Task Main(string[] args)
         {
+
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
-            IMessageSourceClient<IPEndPoint> messenger = new UdpMessenger();
-            var server = new Server<IPEndPoint> (cancellationTokenSource, messenger);
+            IMessageSourceClient<byte[]> messenger = new NetMqMessenger();
+            var server = new Server<byte[]>(cancellationTokenSource, messenger);
             server.IncomingMessage += (BaseMessage message) =>
             {
                 Messages.Push(message);
@@ -43,19 +46,19 @@ namespace Client
                     }
                 }
             });
-            Task waitingForMessage = Task.Run(server.WaitForAMessageAsync);
+            using var runtime = new NetMQRuntime();
+            Task waitingForMessage = Task.Run(() => server.WaitForAMessageAsync());
             Console.WriteLine("Введите Ваш Ник: ");
             BaseMessage message = new MessageCreatorDefault().FactoryMethod();
             message.NicknameFrom = Console.ReadLine();
-            if (server.ClientNetID is IPEndPoint endPoint)
-                message.LocalEndPoint = endPoint;
+            Console.Write("Введите сообщение или Exit для выхода: ");
             do
             {
                 message.Text = Console.ReadLine();
                 if (message.Text.Equals("Exit"))
                 {
                     cancellationTokenSource.Cancel();
-                    waitingForMessage.Wait();
+                    //waitingForMessage.Wait();
                     printerTask.Wait();
                     Console.WriteLine("Спасибо за использование, возвращайтесь!");
                     message.DisconnectRequest = true;

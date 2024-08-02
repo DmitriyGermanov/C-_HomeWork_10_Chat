@@ -12,26 +12,16 @@ namespace Client.Messages
         public string? NicknameFrom { get; set; }
         public string? NicknameTo { get; set; }
         public virtual bool Ask { get; set; }
-        public byte[] ClientNetId
-        {
-            get
-            {
-                if (this.NicknameFrom != null)
-                {
-                    return Encoding.UTF8.GetBytes(NicknameFrom);
+        [JsonIgnore]
+        public byte[] ClientNetId { get; set; }
 
-                }
-                else
-                    return null;
-
-            }
-        }
         public bool DisconnectRequest { get; set; }
         public bool UserIsOnline { get; set; }
         public bool UserDoesNotExist { get; set; }
 
         [JsonIgnore]
         public IPEndPoint LocalEndPoint { get; set; }
+        
         public BaseMessage() { }
 
         public string LocalEndPointString

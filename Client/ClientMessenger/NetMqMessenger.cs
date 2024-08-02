@@ -4,31 +4,37 @@ using Client.Messages;
 
 namespace Client.ClientMessenger
 {
+
     internal class NetMqMessenger : IMessageSourceClient<byte[]>, IDisposable
     {
-        private readonly ResponseSocket _serverSocket;
+        private readonly DealerSocket _dealerSocket;
         private bool _disposed = false;
+        private NetMQRuntime _runtime;
+        private bool disposedValue;
 
         public NetMqMessenger()
         {
-            _serverSocket = new ResponseSocket();
-            _serverSocket.Connect($"tcp://127.0.0.1:12345");
+            _dealerSocket = new DealerSocket();
+            _dealerSocket.Connect("tcp://localhost:12345");
         }
 
         public async Task SendMessageAsync(BaseMessage message)
         {
             string jsonToSend = message.SerializeMessageToJson();
-            _serverSocket.SendFrame(jsonToSend);
+            _dealerSocket.SendFrame(jsonToSend);
             await Task.CompletedTask;
         }
 
+
         public async Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken)
         {
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(NetMqMessenger));
 
-            var message = await _serverSocket.ReceiveFrameStringAsync(ctoken);
-            return BaseMessage.DeserializeFromJson(message.Item1);
+            var clientId = _dealerSocket.ReceiveFrameBytes();
+            var df = _dealerSocket.ReceiveFrameString();
+            var message = BaseMessage.DeserializeFromJson(df);
+            message.ClientNetId = clientId;
+            return message;
+
         }
 
         public byte[] GetServerEndPoint()
@@ -36,13 +42,22 @@ namespace Client.ClientMessenger
             return System.Text.Encoding.UTF8.GetBytes("@tcp://127.0.0.1:12345");
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _dealerSocket?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                _serverSocket?.Dispose();
-                _disposed = true;
-            }
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
