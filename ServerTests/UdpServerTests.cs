@@ -61,8 +61,8 @@ namespace ServerTests
             {
                 eventTriggered = true;
             };
-            mockClientManager.Setup(m => m.GetClientByName(It.IsAny<string>())).Returns(new IPEndPointClient { Name = "TestUser", ClientEndPoint = new IPEndPoint(IPAddress.Loopback, 5555), IsOnline = true });
-            mockClientManager.Setup(m => m.SetClientAskTime(It.IsAny<IPEndPointClient>(), message)).Verifiable();
+            mockClientManager.Setup(m => m.GetClientByName(It.IsAny<string>())).Returns(new IPEndPointClient<IPEndPoint> { Name = "TestUser", ClientEndPoint = new IPEndPoint(IPAddress.Loopback, 5555), IsOnline = true });
+            mockClientManager.Setup(m => m.SetClientAskTime(It.IsAny<IPEndPointClient<IPEndPoint>>(), message)).Verifiable();
             var serverTask = Task.Run(() => server.StartAsync());
             using (UdpClient? client = new UdpClient(0))
             {

@@ -13,10 +13,10 @@ delete: он удаляет клиента из списка
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Server.Clients
 {
-    public class IPEndPointClient : ClientBase
+    public class IPEndPointClient<T> : ClientBase
     {
-        private IPEndPoint clientEndPoint;
-        public virtual IPEndPoint ClientEndPoint
+        private T clientEndPoint;
+        public virtual T ClientEndPoint
         {
             get { return clientEndPoint; }
             set { clientEndPoint = value; }
@@ -37,7 +37,11 @@ namespace Server.Clients
                     throw new Exception("Ошибка преобразования");
                 }*/
                 if (IPEndPoint.TryParse(value, out var result))
-                    clientEndPoint = result;
+                {
+                    if (clientEndPoint is IPEndPoint iPEndPoint)
+                        iPEndPoint = result;
+
+                }
             }
         }
 
@@ -61,7 +65,7 @@ namespace Server.Clients
         //To-do: убрать, оставить только в messenger
         internal override async Task SendToClientAsync<IPEndPoint>(ClientBase? client, BaseMessage message, IMessageSourceServer<IPEndPoint> ms)
         {
-            if (client is IPEndPointClient ipClient)
+            if (client is IPEndPointClient<T> ipClient)
                 await new UdpMessenger().SendMessageAsync(message, ipClient.clientEndPoint);
         }
 

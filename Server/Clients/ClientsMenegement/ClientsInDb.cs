@@ -1,5 +1,6 @@
 ﻿using Server.Messages;
 using Server.ServerMessenger;
+using System.Net;
 namespace Server.Clients.ClientsMenegement
 {
     public class ClientsInDb : IClientMeneger
@@ -20,9 +21,9 @@ namespace Server.Clients.ClientsMenegement
             {
                 existingClient.IsOnline = true;
                 existingClient.AskTime = DateTime.Now;
-                if (existingClient is IPEndPointClient client)
+                if (existingClient is IPEndPointClient<IPEndPoint> client)
                     client.IpEndPointToString = message.LocalEndPointString;
-                if (existingClient is NetMqClient clientMQ)
+                if (existingClient is NetMqClient<byte[]> clientMQ)
                     clientMQ.ClientNetId = message.ClientNetId;
                 ctx.SaveChanges();
             }
@@ -30,7 +31,7 @@ namespace Server.Clients.ClientsMenegement
             {
                 if (message.LocalEndPoint != null)
                 {
-                    IPEndPointClient client = new IPEndPointClient
+                    IPEndPointClient<IPEndPoint> client = new IPEndPointClient<IPEndPoint>
                     {
                         Name = message.NicknameFrom,
                         AskTime = DateTime.Now,
@@ -44,7 +45,7 @@ namespace Server.Clients.ClientsMenegement
                 }
                 else
                 {
-                    NetMqClient client = new NetMqClient
+                    NetMqClient<byte[]> client = new NetMqClient<byte[]>
                     {
                         Name = message.NicknameFrom,
                         AskTime = DateTime.Now,
@@ -85,11 +86,11 @@ namespace Server.Clients.ClientsMenegement
                 ctx.Attach(client);
                 client.IsOnline = true;
                 client.AskTime = DateTime.Now;
-                if (client is IPEndPointClient ipClient)
+                if (client is IPEndPointClient<IPEndPoint> ipClient)
                 {
                     ipClient.IpEndPointToString = message.LocalEndPointString;
                 }
-                else if (client is NetMqClient netMqClient)
+                else if (client is NetMqClient<byte[]> netMqClient)
                 {
                     netMqClient.ClientNetId = message.ClientNetId;
                 }
@@ -126,7 +127,7 @@ namespace Server.Clients.ClientsMenegement
                 {
                     if (!item.Name.Equals(client.Name) && item.IsOnline)
                     {
-                        if (item is NetMqClient clientNetMQ)
+                        if (item is NetMqClient<byte[]> clientNetMQ)
                         item.Receive(message, _messageSourceServer, clientNetMQ.ClientNetId);
                     }
                 }

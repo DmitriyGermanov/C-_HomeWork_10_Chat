@@ -21,11 +21,12 @@ namespace Server.ServerMessenger
 
         }
 
-        public async Task SendMessageAsync(BaseMessage message, byte[] endPoint)
+        public async Task SendMessageAsync<T>(BaseMessage message, T endPoint)
         {
 
             string jsonToSend = message.SerializeMessageToJson();
-            _routerSocket.SendMoreFrame(endPoint).SendFrame(jsonToSend);
+            if (endPoint is byte[] bytes)
+            _routerSocket.SendMoreFrame(bytes).SendFrame(jsonToSend);
             await Task.CompletedTask; 
         }
 

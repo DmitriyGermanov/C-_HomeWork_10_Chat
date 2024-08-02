@@ -5,10 +5,10 @@ using Server.ServerMessenger;
 
 namespace Server.Clients
 {
-    public class NetMqClient : ClientBase
+    public class NetMqClient<T> : ClientBase
     {
-        private byte[] _clientNetId;
-        public virtual byte[] ClientNetId
+        private T _clientNetId;
+        public virtual T ClientNetId
         {
             get { return _clientNetId; }
             set { _clientNetId = value; }

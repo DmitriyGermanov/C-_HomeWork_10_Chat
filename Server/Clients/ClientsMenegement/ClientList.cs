@@ -21,9 +21,9 @@ namespace Server.clients.clientsMenegement
 
         public virtual void ClientRegistration(BaseMessage message)
         {
-            var client = clients.Find(client => client is IPEndPointClient ipClient && ipClient.ClientEndPoint.Equals(message.LocalEndPoint)); if (client == null)
+            var client = clients.Find(client => client is IPEndPointClient<IPEndPoint> ipClient && ipClient.ClientEndPoint.Equals(message.LocalEndPoint)); if (client == null)
             {
-                clients.Add(new IPEndPointClient() { Name = message.NicknameFrom, ClientEndPoint = message.LocalEndPoint, AskTime = DateTime.Now, IsOnline = true });
+                clients.Add(new IPEndPointClient<IPEndPoint>() { Name = message.NicknameFrom, ClientEndPoint = message.LocalEndPoint, AskTime = DateTime.Now, IsOnline = true });
 
             }
             else
@@ -41,13 +41,13 @@ namespace Server.clients.clientsMenegement
         public ClientBase? GetClientByEndPoint(IPEndPoint clientEndPoint)
         {
             if (clientEndPoint != null )
-                return clients.Find(client => client is IPEndPointClient ipClient && ipClient.Equals(clientEndPoint));
+                return clients.Find(client => client is IPEndPointClient<IPEndPoint> ipClient && ipClient.Equals(clientEndPoint));
             else
                 return null;
         }
         public bool RemoveClientByEndPoint(ClientBase clientEndPoint)
         {
-            var clientToRemove = clients.Find(client => client is IPEndPointClient ipClient && ipClient.Equals(clientEndPoint));
+            var clientToRemove = clients.Find(client => client is IPEndPointClient<IPEndPoint> ipClient && ipClient.Equals(clientEndPoint));
             if (clientToRemove != null)
             {
                 return clients.Remove(clientToRemove);

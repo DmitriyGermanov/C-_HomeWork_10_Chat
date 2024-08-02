@@ -2,6 +2,7 @@
 using MySql.EntityFrameworkCore.Extensions;
 using Server.Clients;
 using Server.Messages;
+using System.Net;
 
 namespace Server
 {
@@ -31,17 +32,17 @@ namespace Server
                       .HasMaxLength(255)
                       .IsRequired();
                 entity.HasDiscriminator<string>("ClientType")
-                      .HasValue<IPEndPointClient>("IPEndPointClient").HasValue<NetMqClient>("NetMqClient"); ;
+                      .HasValue<IPEndPointClient<IPEndPoint>>("IPEndPointClient").HasValue < NetMqClient<byte[]>>("NetMqClient"); ;
                 entity.Ignore(e => e.Mediator);
             });
 
-            modelBuilder.Entity<IPEndPointClient>(entity =>
+            modelBuilder.Entity<IPEndPointClient<IPEndPoint>>(entity =>
             {
                 entity.Property(e => e.IpEndPointToString)
                       .HasColumnName("IpEndPointToString");
                 entity.Ignore(e => e.ClientEndPoint);
             });
-            modelBuilder.Entity<NetMqClient>(entity =>
+            modelBuilder.Entity<NetMqClient<byte[]>>(entity =>
             {
                 entity.Property(e => e.ClientNetId)
                          .HasColumnName("ClientNetID");

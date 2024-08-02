@@ -51,9 +51,9 @@ namespace Server
                 {
                     //TODO: Добавить возможность проверки статуса получателя, после проверки перемещаем сообщения в отложенный лист, при смене статуса с offline на online клиента проверяем есть ли сообщения для этого клиента и отправляем ему их
                     BaseMessage? message = messages.Pop();
-                    var clientFrom = clientList.GetClientByName(message.NicknameFrom) as NetMqClient;
+                    var clientFrom = clientList.GetClientByName(message.NicknameFrom) as NetMqClient<byte[]>;
                     //TODO: Заблокировать возможность использовать ники повторно
-                    var clientTo = clientList.GetClientByName(message.NicknameTo) as NetMqClient;
+                    var clientTo = clientList.GetClientByName(message.NicknameTo) as NetMqClient<byte[]>;
 
                     if (clientFrom != null && message.NicknameTo == "")
                     {

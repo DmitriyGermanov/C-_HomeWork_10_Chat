@@ -21,12 +21,15 @@ namespace Server.ServerMessenger
         {
             _udpClient = udpClient;
         }
-        public async Task SendMessageAsync(BaseMessage message, IPEndPoint endPoint)
+        public async Task SendMessageAsync<T>(BaseMessage message, T endPoint)
         {
             using UdpClient udpClient = new UdpClient(0);
             string jSonToSend = message.SerializeMessageToJson();
             byte[] data = System.Text.Encoding.UTF8.GetBytes(jSonToSend);
-            await udpClient.SendAsync(data, data.Length, endPoint);
+            if (endPoint is System.Net.IPEndPoint endP)
+            {
+                await udpClient.SendAsync(data, data.Length, endP);
+            }
         }
 
         protected virtual void Dispose(bool disposing)
