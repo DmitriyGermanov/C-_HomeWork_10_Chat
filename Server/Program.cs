@@ -30,6 +30,8 @@ namespace Server
 
         private static void OnMessageReceived(BaseMessage incomingMessage)
         {
+            Console.WriteLine(incomingMessage);
+            
             messageCollector.MessagesCollector(incomingMessage);
             messageCollector.EndpointCollector(incomingMessage.ClientNetId);
         }

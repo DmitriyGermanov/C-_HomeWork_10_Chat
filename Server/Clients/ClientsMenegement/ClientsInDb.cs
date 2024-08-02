@@ -22,6 +22,8 @@ namespace Server.Clients.ClientsMenegement
                 existingClient.AskTime = DateTime.Now;
                 if (existingClient is IPEndPointClient client)
                     client.IpEndPointToString = message.LocalEndPointString;
+                if (existingClient is NetMqClient clientMQ)
+                    clientMQ.ClientNetId = message.ClientNetId;
                 ctx.SaveChanges();
             }
             else
