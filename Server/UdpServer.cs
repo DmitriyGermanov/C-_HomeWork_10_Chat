@@ -73,11 +73,11 @@ namespace Server
         }
         private async Task ProcessMessage(BaseMessage message)
         {
-            ClientBase client = clientList.GetClientByName(message.NicknameFrom);
-
+            var client = clientList.GetClientByName(message.NicknameFrom);
+            
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
-            if (client == null && message.LocalEndPoint != null || message.ClientNetId != null)
+            if (client == null && (message.LocalEndPoint != null || message.ClientNetId != null))
             {
                 clientList.ClientRegistration(message);
                 IncomingMessage?.Invoke(message);

@@ -116,8 +116,8 @@ namespace Server.Clients.ClientsMenegement
                 {
                     if (!item.Name.Equals(client.Name) && item.IsOnline)
                     {
-                        Console.WriteLine(client);
-                        item.Receive(message, _messageSourceServer, message.ClientNetId);
+                        if (item is NetMqClient clientNetMQ)
+                        item.Receive(message, _messageSourceServer, clientNetMQ.ClientNetId);
                     }
                 }
             }
