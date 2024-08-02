@@ -1,9 +1,9 @@
-﻿using Client.Messages;
-using Client.Messages.Fabric;
-using Client.ClientMessenger;
+﻿using Client.Messages.Fabric;
 using System.Net;
 using NetMQ;
 using NetMQ.Sockets;
+using ClientMessengerLibrary;
+using ClientMessengerNetMQLibrary;
 
 namespace Client
 {

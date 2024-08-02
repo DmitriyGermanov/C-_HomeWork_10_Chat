@@ -1,6 +1,5 @@
-﻿using Client.ClientMessenger;
-using Client.Messages;
-using Client.Messages.Fabric;
+﻿using Client.Messages.Fabric;
+using ClientMessengerLibrary;
 using NetMQ;
 using System.Net;
 using System.Net.Sockets;

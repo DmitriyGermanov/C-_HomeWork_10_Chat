@@ -2,9 +2,8 @@ using System.Net.Sockets;
 using System.Net;
 using Client.Messages;
 using Client;
-using System.Text;
 using Moq;
-using Client.ClientMessenger;
+using ClientMessengerLibrary;
 
 namespace ClientTests
 {

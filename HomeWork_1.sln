@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientTests", "ClientTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientMessengerLibrary", "ClientMessengerLibrary\ClientMessengerLibrary.csproj", "{6C68DBE3-E9FD-4407-B3A8-3C55C5757CB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientMessengerNetMQLibrary", "ClientMessengerNetMQLibrary\ClientMessengerNetMQLibrary.csproj", "{58EE0E82-ABDD-4E88-AD2E-66914CC2E72F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientMessengerUDPLibrary", "ClientMessengerUDPLibrary\ClientMessengerUDPLibrary.csproj", "{91B93FF0-BF81-47DD-B36A-DDF33562FA29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{6C68DBE3-E9FD-4407-B3A8-3C55C5757CB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C68DBE3-E9FD-4407-B3A8-3C55C5757CB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C68DBE3-E9FD-4407-B3A8-3C55C5757CB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58EE0E82-ABDD-4E88-AD2E-66914CC2E72F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58EE0E82-ABDD-4E88-AD2E-66914CC2E72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58EE0E82-ABDD-4E88-AD2E-66914CC2E72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58EE0E82-ABDD-4E88-AD2E-66914CC2E72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91B93FF0-BF81-47DD-B36A-DDF33562FA29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91B93FF0-BF81-47DD-B36A-DDF33562FA29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91B93FF0-BF81-47DD-B36A-DDF33562FA29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91B93FF0-BF81-47DD-B36A-DDF33562FA29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

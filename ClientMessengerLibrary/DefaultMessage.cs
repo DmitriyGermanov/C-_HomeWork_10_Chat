@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Client.Messages
+namespace ClientMessengerLibrary
 {
     public class DefaultMessage : BaseMessage
     {

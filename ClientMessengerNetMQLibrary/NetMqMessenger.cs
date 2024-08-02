@@ -1,11 +1,11 @@
-﻿using NetMQ;
+﻿using ClientMessengerLibrary;
+using NetMQ;
 using NetMQ.Sockets;
-using ClientMessengerLibrary;
 
 namespace ClientMessengerNetMQLibrary
 {
 
-    internal class NetMqMessenger : IMessageSourceClient<byte[]>, IDisposable
+    public class NetMqMessenger : IMessageSourceClient<byte[]>, IDisposable
     {
         private readonly DealerSocket _dealerSocket;
         private bool _disposed = false;
