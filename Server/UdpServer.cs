@@ -42,12 +42,17 @@ namespace Server
         {
             try
             {
+               
                 while (!cToken.IsCancellationRequested)
+            {
+                var receiveTask = Task.Run(() => _messenger.RecieveMessageAsync(cToken), cToken);
+                var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cToken));
+                if (completedTask == receiveTask)
                 {
-                    var receiveTask = _messenger.RecieveMessageAsync(cToken);
                     var message = await receiveTask;
                     ProcessMessage(message);
                 }
+            }
             }
             catch (OperationCanceledException)
             {
