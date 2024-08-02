@@ -1,5 +1,4 @@
-﻿using MySqlX.XDevAPI;
-using Server.Clients.ClientsMenegement;
+﻿using Server.Clients.ClientsMenegement;
 using Server.Messages;
 using Server.ServerMessenger;
 
@@ -24,9 +23,11 @@ namespace Server.Clients
             mediator.Send(message, this);
         }
 
-        internal override Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms)
+        internal override async Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms)
         {
-            throw new NotImplementedException();
+            if (client is NetMqClient<byte[]> clientMqClient) {
+               await ms.SendMessageAsync(message, clientMqClient.ClientNetId);
+            }
         }
     }
 }
