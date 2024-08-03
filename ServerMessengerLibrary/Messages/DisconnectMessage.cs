@@ -1,6 +1,6 @@
 ﻿namespace ServerMessengerLibrary.Messages
 {
-    internal class DisconnectMessage : BaseMessage
+    public class DisconnectMessage : BaseMessage
     {
         public DisconnectMessage()
         {

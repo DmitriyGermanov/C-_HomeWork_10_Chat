@@ -1,6 +1,6 @@
 ﻿namespace ServerMessengerLibrary.Messages
 {
-    internal class AskMessage : BaseMessage
+    public class AskMessage : BaseMessage
     {
 
         public AskMessage()

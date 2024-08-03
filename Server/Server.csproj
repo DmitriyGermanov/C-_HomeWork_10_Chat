@@ -25,4 +25,8 @@
     <PackageReference Include="NetMQ" Version="4.0.1.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ServerMessengerNetMQLibrary\ServerMessengerNetMQLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

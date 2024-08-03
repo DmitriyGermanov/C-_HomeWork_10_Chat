@@ -1,6 +1,6 @@
 ﻿namespace ServerMessengerLibrary.Messages
 {
-    internal class UserDoesNotExistMessage : BaseMessage
+    public class UserDoesNotExistMessage : BaseMessage
     {
         public UserDoesNotExistMessage()
         {

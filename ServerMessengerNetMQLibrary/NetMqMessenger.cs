@@ -5,7 +5,7 @@ using ServerMessengerLibrary.Messages;
 
 namespace ServerMessengerNetMQLibrary
 {
-    internal class NetMqMessenger : IMessageSourceServer<byte[]>, IDisposable
+    public class NetMqMessenger : IMessageSourceServer<byte[]>, IDisposable
     {
         private readonly RouterSocket _routerSocket;
         private bool _disposed = false;

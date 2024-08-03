@@ -1,5 +1,5 @@
-﻿using Server.Clients;
-using Server.ServerMessenger;
+﻿using ServerMessengerLibrary;
+using ServerMessengerLibrary.Clients;
 
 namespace Server.Messages.MesagesMenegement
 {

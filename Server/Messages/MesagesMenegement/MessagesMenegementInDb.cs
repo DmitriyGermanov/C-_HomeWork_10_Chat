@@ -1,7 +1,8 @@
-﻿using Server.Clients;
-using Server.Clients.ClientsMenegement;
-using Server.Messages.Fabric;
-using Server.ServerMessenger;
+﻿using Server.Messages.Fabric;
+using ServerMessengerLibrary;
+using ServerMessengerLibrary.Clients;
+using ServerMessengerLibrary.ClientsMenegement;
+using ServerMessengerLibrary.Messages;
 
 namespace Server.Messages.MesagesMenegement
 {

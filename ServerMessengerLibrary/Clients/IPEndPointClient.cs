@@ -62,7 +62,7 @@ namespace ServerMessengerLibrary.Clients
             return $"Клиент в базе: {Name} с {ClientEndPoint.ToString()}";
         }
         //To-do: убрать, оставить только в messenger
-        internal override async Task SendToClientAsync<IPEndPoint>(ClientBase? client, BaseMessage message, IMessageSourceServer<IPEndPoint> ms)
+        public override async Task SendToClientAsync<IPEndPoint>(ClientBase? client, BaseMessage message, IMessageSourceServer<IPEndPoint> ms)
         {
             if (client is IPEndPointClient<T> ipClient)
                 ms.SendMessageAsync(message, ipClient.clientEndPoint);

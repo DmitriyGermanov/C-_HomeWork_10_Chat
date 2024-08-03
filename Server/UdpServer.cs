@@ -1,8 +1,8 @@
-﻿using Server.Clients;
-using Server.Clients.ClientsMenegement;
-using Server.Messages;
-using Server.Messages.MesagesMenegement;
-using Server.ServerMessenger;
+﻿using Server.Messages.MesagesMenegement;
+using ServerMessengerLibrary;
+using ServerMessengerLibrary.ClientsMenegement;
+using ServerMessengerLibrary.Messages;
+using ServerMessengerNetMQLibrary;
 using System.Net;
 using System.Net.Sockets;
 

@@ -1,9 +1,9 @@
-﻿using Server.Clients;
-using Server.Clients.ClientsMenegement;
-using Server.Messages;
-using Server.Messages.Fabric;
+﻿using Server.Messages.Fabric;
 using Server.Messages.MesagesMenegement;
-using Server.ServerMessenger;
+using ServerMessengerLibrary;
+using ServerMessengerLibrary.Clients;
+using ServerMessengerLibrary.ClientsMenegement;
+using ServerMessengerLibrary.Messages;
 using System.Net;
 namespace Server
 {

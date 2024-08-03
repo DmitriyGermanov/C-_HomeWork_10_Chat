@@ -1,9 +1,9 @@
 using Moq;
 using Server;
-using Server.Clients;
-using Server.Clients.ClientsMenegement;
-using Server.Messages;
 using Server.Messages.MesagesMenegement;
+using ServerMessengerLibrary.Clients;
+using ServerMessengerLibrary.ClientsMenegement;
+using ServerMessengerLibrary.Messages;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

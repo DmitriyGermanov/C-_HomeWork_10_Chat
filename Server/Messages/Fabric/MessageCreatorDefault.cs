@@ -1,4 +1,6 @@
-﻿namespace Server.Messages.Fabric
+﻿using ServerMessengerLibrary.Messages;
+
+namespace Server.Messages.Fabric
 {
     internal class MessageCreatorDefault : BaseMessageFabric
     {

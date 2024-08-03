@@ -11,7 +11,7 @@ namespace ServerMessengerLibrary.ClientsMenegement
         public ClientBase GetClientByName(string name);
         public ClientBase GetClientByID(int? clientId);
         public void SetClientAskTime(ClientBase client, BaseMessage message);
-        internal void SetClientOffline(ClientBase client);
+        public void SetClientOffline(ClientBase client);
 
     }
 }

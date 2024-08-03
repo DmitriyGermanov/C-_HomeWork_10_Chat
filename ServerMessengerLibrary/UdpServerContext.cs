@@ -5,7 +5,7 @@ using System.Net;
 
 namespace ServerMessengerLibrary
 {
-    internal class UdpServerContext : DbContext
+    public class UdpServerContext : DbContext
     {
         public DbSet<ClientBase> Clients { get; set; }
         public DbSet<BaseMessage> Messages { get; set; }

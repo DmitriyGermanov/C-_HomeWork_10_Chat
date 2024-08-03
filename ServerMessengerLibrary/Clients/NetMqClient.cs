@@ -23,7 +23,7 @@ namespace ServerMessengerLibrary.Clients
             mediator.Send(message, this);
         }
 
-        internal override async Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms)
+        public override async Task SendToClientAsync<T>(ClientBase? client, BaseMessage message, IMessageSourceServer<T> ms)
         {
             if (client is NetMqClient<byte[]> clientMqClient) {
                await ms.SendMessageAsync(message, clientMqClient.ClientNetId);

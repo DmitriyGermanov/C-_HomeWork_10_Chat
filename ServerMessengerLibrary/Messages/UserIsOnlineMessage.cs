@@ -1,6 +1,6 @@
 ﻿namespace ServerMessengerLibrary.Messages
 {
-    internal class UserIsOnlineMessage : BaseMessage
+    public class UserIsOnlineMessage : BaseMessage
     {
         public UserIsOnlineMessage()
         {
