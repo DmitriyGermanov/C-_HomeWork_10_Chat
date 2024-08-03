@@ -23,18 +23,17 @@ namespace Server
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
-            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
             this._messenger = new NetMqMessenger();
             this.clientList = new ClientsInDb(_messenger);
+            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
         }
         public UdpServer(CancellationTokenSource cancellationToken)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-
-            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
             this._messenger = new NetMqMessenger();
             this.clientList = new ClientsInDb(_messenger);
+            this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
         }
 
         public async Task StartAsync()

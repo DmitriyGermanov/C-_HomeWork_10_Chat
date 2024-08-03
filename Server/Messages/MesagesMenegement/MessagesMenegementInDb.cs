@@ -45,8 +45,8 @@ namespace Server.Messages.MesagesMenegement
 
                         foreach (var message in messages)
                         {
-                            message.NicknameFrom = clientsInDb.GetClientByID(message.UserIDFrom).Name;
                             Console.WriteLine(message);
+                            message.NicknameFrom = clientsInDb.GetClientByID(message.UserIDFrom).Name;
                             await serverClient.SendToClientAsync(serverClient, message, ms);
                         }
                         await serverClient.SendToClientAsync(serverClient, new MessageCreatorDefault().FactoryMethodWIthText($"У вас {messages.Count} непрочитанных сообщений:"), ms);
