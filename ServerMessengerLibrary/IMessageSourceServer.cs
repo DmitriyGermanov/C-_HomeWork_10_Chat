@@ -1,9 +1,13 @@
-﻿namespace ServerMessengerLibrary
+﻿
+using ServerMessengerLibrary.Messages;
+
+namespace ServerMessengerLibrary
 {
     public interface IMessageSourceServer<T> : IDisposable
     {
-        Task SendMessageAsync(BaseMessage message, T endpoint);
-        Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken);
-        T GetServerEndPoint();
+        public abstract Task SendMessageAsync<T>(BaseMessage message, T endpoint);
+        public Task<BaseMessage> RecieveMessageAsync(CancellationToken ctoken);
+        public T GetServerEndPoint();
+
     }
 }

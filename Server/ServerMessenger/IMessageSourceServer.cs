@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Server.Messages;
+﻿using Server.Messages;
 
 namespace Server.ServerMessenger
 {
