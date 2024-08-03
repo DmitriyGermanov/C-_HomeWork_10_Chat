@@ -3,7 +3,6 @@ using ServerMessengerLibrary;
 using ServerMessengerLibrary.ClientsMenegement;
 using ServerMessengerLibrary.Messages;
 using ServerMessengerNetMQLibrary;
-using System.Net;
 using System.Net.Sockets;
 
 namespace Server
@@ -32,7 +31,7 @@ namespace Server
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
-            
+
             this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
             this._messenger = new NetMqMessenger();
             this.clientList = new ClientsInDb(_messenger);
@@ -42,17 +41,17 @@ namespace Server
         {
             try
             {
-               
+
                 while (!cToken.IsCancellationRequested)
-            {
-                var receiveTask = Task.Run(() => _messenger.RecieveMessageAsync(cToken), cToken);
-                var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cToken));
-                if (completedTask == receiveTask)
                 {
-                    var message = await receiveTask;
-                    ProcessMessage(message);
+                    var receiveTask = Task.Run(() => _messenger.RecieveMessageAsync(cToken), cToken);
+                    var completedTask = await Task.WhenAny(receiveTask, Task.Delay(Timeout.Infinite, cToken));
+                    if (completedTask == receiveTask)
+                    {
+                        var message = await receiveTask;
+                        ProcessMessage(message);
+                    }
                 }
-            }
             }
             catch (OperationCanceledException)
             {
@@ -79,7 +78,7 @@ namespace Server
         private async Task ProcessMessage(BaseMessage message)
         {
             var client = clientList.GetClientByName(message.NicknameFrom);
-            
+
             if (client != null && client.IsOnline && !message.DisconnectRequest)
                 clientList.SetClientAskTime(client, message);
             if (client == null)

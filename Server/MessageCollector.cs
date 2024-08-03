@@ -4,7 +4,6 @@ using ServerMessengerLibrary;
 using ServerMessengerLibrary.Clients;
 using ServerMessengerLibrary.ClientsMenegement;
 using ServerMessengerLibrary.Messages;
-using System.Net;
 namespace Server
 {
     public class MessageCollector<T>
@@ -83,11 +82,11 @@ namespace Server
         }
         public async Task SendAnswerFromEndpointRow()
         {
-            
+
             BaseMessage? message = new MessageCreatorDefault().FactoryMethodWIthText("Сообщение было получено серверо");
             while (!cToken.IsCancellationRequested)
             {
-                
+
                 if (endPoints.Count > 0)
                 {
                     Console.WriteLine("Сработал SendAnswerFromEndpointRow");
