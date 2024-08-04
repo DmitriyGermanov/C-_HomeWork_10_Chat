@@ -10,7 +10,7 @@ namespace Server
         {
             CancellationToken cTokenStopAll = cancellationTokenSource.Token;
             
-            UdpServer server = new UdpServer(cancellationTokenSource);
+            MainServer server = new MainServer(cancellationTokenSource);
             messageCollector = new MessageCollector<byte[]>(cancellationTokenSource, server.ClientMeneger, server.Messenger);
             server.IncomingMessage += OnMessageReceived;
             Task serverTask = Task.Run(server.StartAsync);

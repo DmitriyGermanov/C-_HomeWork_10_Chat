@@ -15,7 +15,7 @@ namespace ServerTests
     {
         private Mock<IClientMeneger> mockClientManager;
         private Mock<IMessagesMenegement> mockMessageMeneger;
-        private UdpServer server;
+        private MainServer server;
         private CancellationTokenSource cancellationTokenSource;
 
         [TestInitialize]
@@ -24,7 +24,7 @@ namespace ServerTests
             mockClientManager = new Mock<IClientMeneger>();
             mockMessageMeneger = new Mock<IMessagesMenegement>();
             cancellationTokenSource = new CancellationTokenSource();
-            server = new UdpServer(cancellationTokenSource);
+            server = new MainServer(cancellationTokenSource);
         }
 
         [TestMethod]

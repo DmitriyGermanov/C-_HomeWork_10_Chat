@@ -8,7 +8,7 @@ using System.Net.Sockets;
 namespace Server
 {
     public delegate void ServerDelegate(BaseMessage message);
-    public class UdpServer
+    public class MainServer
     {
         public event ServerDelegate? IncomingMessage;
         private CancellationTokenSource cancellationToken;
@@ -19,7 +19,7 @@ namespace Server
         private IMessageSourceServer<byte[]> _messenger;
         public IMessageSourceServer<byte[]> Messenger { get => _messenger; private set { } }
 
-        public UdpServer()
+        public MainServer()
         {
             cancellationToken = new CancellationTokenSource();
             cToken = cancellationToken.Token;
@@ -27,7 +27,7 @@ namespace Server
             this.clientList = new ClientsInDb(_messenger);
             this._messageMenegerInDb = new MessagesMenegementInDb(clientList);
         }
-        public UdpServer(CancellationTokenSource cancellationToken)
+        public MainServer(CancellationTokenSource cancellationToken)
         {
             this.cancellationToken = cancellationToken;
             cToken = cancellationToken.Token;
