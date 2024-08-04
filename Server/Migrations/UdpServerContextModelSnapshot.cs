@@ -7,7 +7,7 @@ using ServerMessengerLibrary;
 
 namespace Server.Migrations
 {
-    [DbContext(typeof(UdpServerContext))]
+    [DbContext(typeof(MainServerContext))]
     partial class UdpServerContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

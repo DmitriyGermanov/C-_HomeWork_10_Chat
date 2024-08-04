@@ -15,7 +15,7 @@ namespace ServerMessengerLibrary.ClientsMenegement
         public void ClientRegistration(BaseMessage message)
         {
             Console.WriteLine("сработал ClientReg");
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             var existingClient = ctx.Clients.FirstOrDefault(c => c.Name.Equals(message.NicknameFrom));
             if (existingClient != null)
             {
@@ -60,7 +60,7 @@ namespace ServerMessengerLibrary.ClientsMenegement
 
         public ClientBase? GetClientByName(string name)
         {
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             var client = ctx.Clients.FirstOrDefault(c => c.Name.Equals(name));
             if (client == null)
             {
@@ -73,14 +73,14 @@ namespace ServerMessengerLibrary.ClientsMenegement
         }
         public ClientBase GetClientByID(int? clientId)
         {
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             return ctx.Clients.FirstOrDefault(c => c.ClientID == clientId);
         }
 
         public void SetClientAskTime(ClientBase client, BaseMessage message)
         {
             Console.WriteLine("сработал SetClientAskTimeInDb");
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             if (client != null)
             {
                 ctx.Attach(client);
@@ -105,7 +105,7 @@ namespace ServerMessengerLibrary.ClientsMenegement
         public void SetClientOffline(ClientBase client)
         {
             Console.WriteLine("сработал SetClientOfflineInDb");
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             if (client != null)
             {
                 ctx.Attach(client);
@@ -120,7 +120,7 @@ namespace ServerMessengerLibrary.ClientsMenegement
         public void Send(BaseMessage message, ClientBase client)
         {
             Console.WriteLine("сработал SendToAll");
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
             if (client != null)
             {
                 foreach (var item in ctx.Clients)

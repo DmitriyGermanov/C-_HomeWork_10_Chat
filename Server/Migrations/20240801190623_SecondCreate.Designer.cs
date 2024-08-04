@@ -8,7 +8,7 @@ using ServerMessengerLibrary;
 
 namespace Server.Migrations
 {
-    [DbContext(typeof(UdpServerContext))]
+    [DbContext(typeof(MainServerContext))]
     [Migration("20240801190623_SecondCreate")]
     partial class SecondCreate
     {

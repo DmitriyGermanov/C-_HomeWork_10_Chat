@@ -5,13 +5,13 @@ using System.Net;
 
 namespace ServerMessengerLibrary
 {
-    public class UdpServerContext : DbContext
+    public class MainServerContext : DbContext
     {
         public DbSet<ClientBase> Clients { get; set; }
         public DbSet<BaseMessage> Messages { get; set; }
         public DbSet<DefaultMessage> DefaultMessages { get; set; }
 
-        public UdpServerContext() { }
+        public MainServerContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

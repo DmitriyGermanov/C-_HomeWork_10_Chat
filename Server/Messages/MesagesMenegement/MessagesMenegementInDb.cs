@@ -17,7 +17,7 @@ namespace Server.Messages.MesagesMenegement
 
         public static void SaveMessageToDb(BaseMessage baseMessage)
         {
-            using var ctx = new UdpServerContext();
+            using var ctx = new MainServerContext();
 
             try
             {
@@ -35,7 +35,7 @@ namespace Server.Messages.MesagesMenegement
        public async Task ShowUnrecievedMessagesAsync<T>(ClientBase serverClient, IMessageSourceServer<T> ms)
         {
             Console.WriteLine("Сработал ShowUnrecievedMessages");
-            using (var ctx = new UdpServerContext())
+            using (var ctx = new MainServerContext())
             {
                 try
                 {
